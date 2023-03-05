@@ -1,7 +1,55 @@
 import { Button, Pressable, StyleSheet, Text, TextInput, View,Alert } from 'react-native';
+import {Cloudinary} from '@cloudinary/url-gen'
+import {Resize} from '@cloudinary/url-gen/actions'
+import ImagePicker from 'react-native-image-picker';
 import React, {useState} from 'react'
+import { ref,uploadBytes } from "firebase/storage";
+import { storage } from '../components/config/config'
 
 const Register = ({navigation}) => {
+
+  const cldInstance = new Cloudinary({cloud: {cloudName: 'djkki9hz1'}});
+
+  const [image, setImage] = useState(null);
+
+  chooseImage = () => {
+    let options = {
+      title: 'Select Image',
+      customButtons: [
+        { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
+      ],
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    ImagePicker.showImagePicker(options, (response) => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+        alert(response.customButton);
+      } else {
+        const source = { uri: response.uri };
+
+        // You can also display the image using data:
+        // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+        // alert(JSON.stringify(response));s
+        console.log('response', JSON.stringify(response));
+        this.setState({
+          filePath: response,
+          fileData: response.data,
+          fileUri: response.uri
+        });
+      }
+    });
+  }
+
+
   let msg ="";
   
     const [state,setstate] = useState({
@@ -35,13 +83,14 @@ const Register = ({navigation}) => {
 
     
 
-      fetch("http://192.168.1.105:3000/signup",requestOptions)
+      fetch("http://192.168.1.102:3000/signup",requestOptions)
       .then(res =>{
         console.log(res.status);
         if (res.status=="400"){
           console.log("error")
         }else{
           navigation.navigate('Login')
+
         }
         return res.json();
       }).then(
@@ -70,13 +119,22 @@ const Register = ({navigation}) => {
         numberOfLines={4}
         maxLength={50} placeholder='Biografia (Opcional)' style={styles.InputBio}></TextInput>
         
-      <Pressable onPress={()=>{registrar(state.nombre,state.apellido,state.usuario,state.pass,state.bio)}} style={({pressed}) => [
+      <Pressable onPress={()=>{registrar(state.nombre,state.apellido,state.usuario,state.password,state.bio)}} style={({pressed}) => [
             {
               backgroundColor: pressed ? 'rgba(6, 153, 240, 0.2)' : 'transparent',
             },
             styles.Registro,
           ]}>
           <Text style={styles.textRegistro}>Registro</Text>
+          </Pressable>
+
+          <Pressable onPress={chooseImage} style={({pressed}) => [
+            {
+              backgroundColor: pressed ? 'rgba(6, 153, 240, 0.2)' : 'transparent',
+            },
+            styles.Registro,
+          ]}>
+          <Text style={styles.textRegistro}>Elegir imagen</Text>
           </Pressable>
       </View>
     </View>

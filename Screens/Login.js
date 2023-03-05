@@ -3,10 +3,17 @@ import React, {useState} from 'react'
 
 const Login = ({navigation}) => {
 
+  let msg ="";
+
     const [state,setstate] = useState({
        usuario:'',
        password:'' 
     })
+
+    const createTwoButtonAlert = () =>
+    Alert.alert('Alerta!', `${msg}`, [
+      {text: 'OK', onPress: () => console.log('OK Pressed')},
+    ]);
 
 
     let registrar = (user,pass)=>{
@@ -21,21 +28,27 @@ const Login = ({navigation}) => {
       usuario:`${user}`,
       password:`${pass}`,
     })}
-
-      fetch("http://192.168.1.105:3000/signIn",requestOptions)
+      //axios
+      fetch("http://192.168.1.102:3000/signIn",requestOptions)
       .then(res =>{
         console.log(res.status);
         if (res.status=="400"){
-          console.log("error")
-        }else{
-          navigation.navigate('Home')
-        }
+          msg="error";
+        }else{}
         return res.json();
       }).then(
         (result) =>{
-          console.log(result);
+          if (msg=="error") {
+            msg=result.msg
+          createTwoButtonAlert();
+          }else{
+            navigation.navigate('Home',{
+              token:result.token,
+              userid:result.user._id
+            })
+            console.log(result);
+          }
         }
-        
       )
      }
     
@@ -44,8 +57,8 @@ const Login = ({navigation}) => {
         <Text style={styles.Titulo}> Inicio De Sesion </Text>
         <View style={styles.Carta}>
           <TextInput onChangeText={(value) => setstate({...state, usuario:value})} placeholder='Usuario' style={styles.Input}></TextInput>
-          <TextInput onChangeText={(value) => setstate({...state, password:value})} placeholder='Password' style={styles.Input}></TextInput>
-          <Pressable onPress={()=>{registrar(state.usuario,state.pass)}} style={({pressed}) => [
+          <TextInput onChangeText={(value) => setstate({...state, password:value})} secureTextEntry={true} placeholder='Password' style={styles.Input}></TextInput>
+          <Pressable onPress={()=>{registrar(state.usuario,state.password)}} style={({pressed}) => [
             {
               backgroundColor: pressed ? 'rgba(0, 255, 56, 0.20)' : 'transparent',
             },
