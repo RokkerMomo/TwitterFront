@@ -4,8 +4,38 @@ import React, { useEffect,useState } from 'react'
 
 
 
-const button = ({id}) => {
+const button = ({idTweet,userid}) => {
     const [numero,setnumero] = useState(0)
+
+    const darLike = ()=>{
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          idTweet:`${idTweet}`,
+          idUsuario:`${userid}`
+        })}
+          //axios
+          fetch("http://192.168.1.102:3000/like",requestOptions)
+          .then(res =>{
+            if (res.status=="400"){
+              msg="error";
+            }else{}
+            return res.json();
+          }).then(
+            (result) =>{
+              console.log(result.msg)
+            if (result.msg=="Se dio like") {
+              setnumero(numero+1)
+            }else{
+              setnumero(numero-1)
+            }
+            }
+          )
+    }
 
     useEffect(()=>{
         const requestOptions = {
@@ -15,12 +45,11 @@ const button = ({id}) => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              idTweet:`${id}`
+              idTweet:`${idTweet}`
             })}
               //axios
               fetch("http://192.168.1.102:3000/getlikes",requestOptions)
               .then(res =>{
-                console.log(res.status);
                 if (res.status=="400"){
                   msg="error";
                 }else{}
@@ -28,14 +57,15 @@ const button = ({id}) => {
               }).then(
                 (result) =>{
                 setnumero(result)
+                console.log('AQUI ESTA EL NUMERO')
+                console.log(result)
                 }
               )
-              console.log(numero)
               return numero;
     },[])
 
   return (
-    <Pressable style={styles.heart}><Ionicons  name="heart-outline" size={20} color="white" /><Text style={styles.number}>{numero}</Text></Pressable>
+    <Pressable onPress={()=>{darLike()}} style={styles.heart}><Ionicons  name="heart-outline" size={20} color="white" /><Text style={styles.number}>{numero}</Text></Pressable>
   )
 }
 

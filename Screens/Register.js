@@ -1,54 +1,78 @@
-import { Button, Pressable, StyleSheet, Text, TextInput, View,Alert } from 'react-native';
-import {Cloudinary} from '@cloudinary/url-gen'
-import {Resize} from '@cloudinary/url-gen/actions'
-import ImagePicker from 'react-native-image-picker';
+import {Button, Pressable, StyleSheet, Text, TextInput, View,Alert,Image, ScrollView } from 'react-native';
+import * as ImagePicker from 'expo-image-picker'
 import React, {useState} from 'react'
-import { ref,uploadBytes } from "firebase/storage";
-import { storage } from '../components/config/config'
+import { firebase, UploadFile } from "../components/config/config";
+import { MaterialIcons } from '@expo/vector-icons';
+
 
 const Register = ({navigation}) => {
+  const [image,setImage] = useState(null);
+  const [mostrar,setmostrar] = useState(null);
+  const [resultadoimagen,setresultadoimagen] = useState(null);
+  const [uploading,setUploading] = useState(false);
 
-  const cldInstance = new Cloudinary({cloud: {cloudName: 'djkki9hz1'}});
-
-  const [image, setImage] = useState(null);
-
-  chooseImage = () => {
-    let options = {
-      title: 'Select Image',
-      customButtons: [
-        { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
-      ],
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-    ImagePicker.showImagePicker(options, (response) => {
-      console.log('Response = ', response);
-
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-        alert(response.customButton);
-      } else {
-        const source = { uri: response.uri };
-
-        // You can also display the image using data:
-        // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-        // alert(JSON.stringify(response));s
-        console.log('response', JSON.stringify(response));
-        this.setState({
-          filePath: response,
-          fileData: response.data,
-          fileUri: response.uri
-        });
-      }
+  const pickImage = async () =>{
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
+
+    if (!result.canceled) {
+    const source = {uri:result.uri};
+    console.log(source)
+    console.log(result)
+    setImage(source);
+    setmostrar(result.assets[0].uri)
+    }
+
   }
 
+  const uploadImage = async (name,LastName,user,pass,bio) =>{
+    setUploading(true);
+    const response = await fetch(image.uri)
+    const blob = await response.blob();
+    const filename = image.uri.substring(image.uri.lastIndexOf('/')+1);
+    const result = await UploadFile(blob,filename)
+    console.log(result)
+    setresultadoimagen(result)
+
+    const requestOptions = {
+      method: 'POST',
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    nombre:`${name}`,
+    apellido:`${LastName}`,
+    usuario:`${user}`,
+    password:`${pass}`,
+    bio:`${bio}`,
+    foto:`${result}`
+  })}
+
+    fetch("http://192.168.1.102:3000/signup",requestOptions)
+    .then(res =>{
+      console.log(res.status);
+      if (res.status=="400"){
+        console.log("error")
+      }else{
+        navigation.navigate('Login')
+
+      }
+      return res.json();
+    }).then(
+      (result) =>{
+        console.log(result);
+        msg=result.msg;
+        createTwoButtonAlert();
+      }
+      
+    )
+  }
 
   let msg ="";
   
@@ -66,45 +90,9 @@ const Register = ({navigation}) => {
     ]);
 
      
-     let registrar = (name,LastName,user,pass,bio)=>{
-      const requestOptions = {
-        method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      nombre:`${name}`,
-      apellido:`${LastName}`,
-      usuario:`${user}`,
-      password:`${pass}`,
-      bio:`${bio}`
-    })}
-
-    
-
-      fetch("http://192.168.1.102:3000/signup",requestOptions)
-      .then(res =>{
-        console.log(res.status);
-        if (res.status=="400"){
-          console.log("error")
-        }else{
-          navigation.navigate('Login')
-
-        }
-        return res.json();
-      }).then(
-        (result) =>{
-          console.log(result);
-          msg=result.msg;
-          createTwoButtonAlert();
-        }
-        
-      )
-     }
-
   return (
     <View style={styles.Body}>
+      <ScrollView>
       <Text style={styles.Titulo}> Registrar Usuario </Text>
       <View style={styles.Carta}>
         <Text style={styles.datos}>Ingrese Sus Datos</Text>
@@ -119,7 +107,12 @@ const Register = ({navigation}) => {
         numberOfLines={4}
         maxLength={50} placeholder='Biografia (Opcional)' style={styles.InputBio}></TextInput>
         
-      <Pressable onPress={()=>{registrar(state.nombre,state.apellido,state.usuario,state.password,state.bio)}} style={({pressed}) => [
+        <Pressable onPress={pickImage} style={styles.agregarfoto}>
+        {image && <Image source={{ uri: mostrar }} style={{ width: 200, height: 200, position:'absolute' }} />}
+          <MaterialIcons name="add-a-photo" size={24} color="grey" />
+          </Pressable>
+        
+      <Pressable onPress={()=>{uploadImage(state.nombre,state.apellido,state.usuario,state.password,state.bio)}} style={({pressed}) => [
             {
               backgroundColor: pressed ? 'rgba(6, 153, 240, 0.2)' : 'transparent',
             },
@@ -128,15 +121,10 @@ const Register = ({navigation}) => {
           <Text style={styles.textRegistro}>Registro</Text>
           </Pressable>
 
-          <Pressable onPress={chooseImage} style={({pressed}) => [
-            {
-              backgroundColor: pressed ? 'rgba(6, 153, 240, 0.2)' : 'transparent',
-            },
-            styles.Registro,
-          ]}>
-          <Text style={styles.textRegistro}>Elegir imagen</Text>
-          </Pressable>
+         
+
       </View>
+      </ScrollView>
     </View>
   )
 }
@@ -164,7 +152,7 @@ const styles = StyleSheet.create({
     Carta:{
       backgroundColor:'#16202A',
       width:280,
-      height:400,
+      height:590,
       borderRadius:10,
       paddingTop:16,
       paddingRight:20,
@@ -182,7 +170,7 @@ const styles = StyleSheet.create({
     InputBio:{
         backgroundColor: '#FFFFFF',
         borderRadius: 5,
-        marginBottom:20,
+        marginBottom:10,
         paddingLeft:5,
         height:80,
       },
@@ -221,6 +209,15 @@ const styles = StyleSheet.create({
     textRegistro:{
       color:'#0699F0',
     },
+    agregarfoto:{
+      backgroundColor: '#FFFFFF',
+        borderRadius: 5,
+        marginBottom:10,
+        width: 200, height: 200,
+        justifyContent:'center',
+        alignItems:'center',
+        marginLeft:20,
+    }
     
 })
 

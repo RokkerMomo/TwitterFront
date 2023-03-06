@@ -8,15 +8,17 @@ import Home from "../Screens/Home";
 import Login from "../Screens/Login";
 import Register from "../Screens/Register";
 import NewTweet from "../Screens/NewTweet";
+import Perfil from "../Screens/Profile";
 
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
+
 const MainStack = ()=>{
     return(
         <NavigationContainer>
 
-            <Drawer.Navigator screenOptions={{
+            <Stack.Navigator screenOptions={{
 
                 headerShown:false,
                 headerTintColor:'#fff',
@@ -66,6 +68,21 @@ const MainStack = ()=>{
                 component={Home}></Stack.Screen>
                 
                 <Stack.Screen
+                name="Perfil"
+                options={{
+                    title: 'Perfil',
+                    drawerIcon: ({focused, size}) => (
+                       <Ionicons
+                          name="person-outline"
+                          size={size}
+                          color={focused ? '#7cc' : '#ccc'}
+                       />
+                    ),headerShown:false,
+                    
+                 }}
+                component={Perfil}></Stack.Screen>
+
+                <Stack.Screen
                 name="Salir"
                 options={{
                     title: 'Salir',
@@ -87,7 +104,7 @@ const MainStack = ()=>{
                 }}
                 component={NewTweet}></Stack.Screen>
                 
-            </Drawer.Navigator>
+            </Stack.Navigator>
         </NavigationContainer>
     );
 }
