@@ -1,0 +1,86 @@
+import { View, Text } from 'react-native'
+import React from 'react'
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import Home from "./Home";
+import Login from "./Login";
+import Register from "./Register";
+import NewTweet from "./NewTweet";
+import Perfil from "./Profile";
+import Home2 from "./Home2";
+
+const contenedor = createDrawerNavigator();
+
+const Drawer = ({route, navigation}) => {
+    console.log(route.params);
+  return (
+    <contenedor.Navigator screenOptions={{
+
+headerShown:true,
+headerTintColor:'#fff',
+drawerActiveTintColor:'#16202A',
+drawerInactiveTintColor:'#FFF',
+swipeEnabled:true,
+
+headerStyle:{
+    backgroundColor:'#16202A',
+    height:60,
+},
+
+drawerStyle:{
+    backgroundColor:'#637885',
+},
+}}>
+      <contenedor.Group>
+    <contenedor.Screen name="Home" initialParams={{ params: route.params }} options={{
+    drawerIcon: ({focused, size}) => (
+       <Ionicons
+          name="md-home"
+          size={size}
+          color={focused ? '#7cc' : '#ccc'}
+       />
+    )
+    }} component={Home} />
+    <contenedor.Screen name="MyProfile" initialParams={{userid: route.params.params.userid}} options={{
+    drawerIcon: ({focused, size}) => (
+       <Ionicons
+          name="person"
+          size={size}
+          color={focused ? '#7cc' : '#ccc'}
+       />
+    )
+    }} component={Perfil} />
+
+<contenedor.Screen name="Salir" options={{
+    drawerIcon: ({focused, size}) => (
+       <Ionicons
+          name="exit"
+          size={size}
+          color={focused ? '#7cc' : '#ccc'}
+       />
+    )
+    }} component={Login} />
+    </contenedor.Group>
+
+
+
+    <contenedor.Screen name="Profile" initialParams={{userid: route.params.params.userid}} options={{
+      unmountOnBlur:true,drawerItemStyle:{height:0}}} component={Perfil} />
+
+      <contenedor.Screen name='NewTweet' options={{
+                    drawerItemStyle: { height: 0 },
+                    headerShown:false,
+                    unmountOnBlur:true
+                }} 
+                initialParams={{userid: route.params.params.userid}} component={NewTweet}/>
+
+      
+
+    </contenedor.Navigator>
+    
+  )
+}
+
+export default Drawer

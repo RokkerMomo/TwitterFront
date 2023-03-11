@@ -3,7 +3,7 @@ import * as ImagePicker from 'expo-image-picker'
 import React, {useState} from 'react'
 import { firebase, UploadFile } from "../components/config/config";
 import { MaterialIcons } from '@expo/vector-icons';
-
+import env from '../env';
 
 const Register = ({navigation}) => {
   const [image,setImage] = useState(null);
@@ -54,7 +54,7 @@ const Register = ({navigation}) => {
     foto:`${result}`
   })}
 
-    fetch("http://192.168.1.102:3000/signup",requestOptions)
+    fetch(`${env.SERVER.URI}/signup`,requestOptions)
     .then(res =>{
       console.log(res.status);
       if (res.status=="400"){
@@ -91,9 +91,8 @@ const Register = ({navigation}) => {
 
      
   return (
+    <ScrollView>
     <View style={styles.Body}>
-      <ScrollView>
-      <Text style={styles.Titulo}> Registrar Usuario </Text>
       <View style={styles.Carta}>
         <Text style={styles.datos}>Ingrese Sus Datos</Text>
 
@@ -124,8 +123,9 @@ const Register = ({navigation}) => {
          
 
       </View>
-      </ScrollView>
+     
     </View>
+    </ScrollView>
   )
 }
 
@@ -157,7 +157,8 @@ const styles = StyleSheet.create({
       paddingTop:16,
       paddingRight:20,
       paddingLeft:20,
-    
+    marginTop:10,
+    marginBottom:10,
     
     },
     Input:{

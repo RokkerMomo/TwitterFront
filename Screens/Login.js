@@ -1,5 +1,6 @@
 import { Button, Pressable, StyleSheet, Text, TextInput, View,Alert } from 'react-native';
 import React, {useState} from 'react'
+import env from '../env';
 
 const Login = ({navigation}) => {
 
@@ -16,8 +17,7 @@ const Login = ({navigation}) => {
     ]);
 
 
-    let registrar = (user,pass)=>{
-
+    let ingresar = async (user,pass)=>{
     const requestOptions = {
     method: 'POST',
     headers: {
@@ -29,7 +29,7 @@ const Login = ({navigation}) => {
       password:`${pass}`,
     })}
       //axios
-      fetch("http://192.168.1.102:3000/signIn",requestOptions)
+      await fetch(`${env.SERVER.URI}/signIn`,requestOptions)
       .then(res =>{
         console.log(res.status);
         if (res.status=="400"){
@@ -42,23 +42,26 @@ const Login = ({navigation}) => {
             msg=result.msg
           createTwoButtonAlert();
           }else{
-            navigation.navigate('Home',{
-              token:result.token,
-              userid:result.user._id
-            })
+            navigation.navigate('Drawer', {
+              screen: 'Drawer',
+              params: { 
+                token:result.token,
+                userid:result.user._id,},
+            });
             console.log(result);
           }
         }
       )
      }
     
+     
   return (
     <View style={styles.Body}>
         <Text style={styles.Titulo}> Inicio De Sesion </Text>
         <View style={styles.Carta}>
           <TextInput onChangeText={(value) => setstate({...state, usuario:value})} placeholder='Usuario' style={styles.Input}></TextInput>
           <TextInput onChangeText={(value) => setstate({...state, password:value})} secureTextEntry={true} placeholder='Password' style={styles.Input}></TextInput>
-          <Pressable onPress={()=>{registrar(state.usuario,state.password)}} style={({pressed}) => [
+          <Pressable onPress={()=>{ingresar(state.usuario,state.password)}} style={({pressed}) => [
             {
               backgroundColor: pressed ? 'rgba(0, 255, 56, 0.20)' : 'transparent',
             },

@@ -1,59 +1,85 @@
-import { Button, Pressable, StyleSheet, Text, TextInput, View,Alert, ScrollView,Image } from 'react-native';
+import { Button, Pressable, StyleSheet, Text, View,
+ScrollView,Image,RefreshControl,ActivityIndicator} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import Like from "../components/button";
+import env from '../env';
+
 const Home = ({route,navigation}) => {
 
   const [Tweets,setTweets] = useState(null)
-  const [state,setState] = useState(null)
+  const [state,setState] = useState(true)
+  const [refreshing, setRefreshing] = React.useState(false);
   var Data = [];
 
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 200);
+  }, []);
+
+
+  async function getTweets (){
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        owner:`${userid}`
+      })}
+  await fetch(`${env.SERVER.URI}/showalltweets`,requestOptions)
+  .then((response) => response.json())
+  .then((data) =>{
+    Data= [...Data,data];
+        const info = Data[0];
+        if (Tweets!==info['Tweets']) {
+          setTweets(info["Tweets"])
+          setState(false)
+        console.log(Tweets)
+        } else {
+        }
+        
+  } );
+  };
+
   useEffect(() => {
-    const getTweets = async ()=>{
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          owner:`${userid}`
-        })}
-     await fetch("http://192.168.1.102:3000/showuserTweets",requestOptions)
-    .then((response) => response.json())
-    .then((data) =>{
-      Data= [...Data,data];
-          const info = Data[0];
-          if (Tweets!==info['Tweets']) {
-            setTweets(info["Tweets"])
-          console.log(Tweets)
-          } else {
-          }
-          
-    } );
-    }
+
+    
     getTweets();
-  },[state]);
+    
+  },[refreshing]);
 
   const {userid,Token} = route.params;
   return (
+
     <View style={styles.Body}>
-      <ScrollView>
+      <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
+        
       {Tweets&&Tweets.map((Tweet) => {
         const fecha = Tweet.fecha.slice(0, 10);
         return (
+          
           <View key={Tweet._id} style={styles.Carta}>
           <View style={styles.contenido}>
-          <View style={styles.Foto}>
+          <Pressable onPress={()=>{navigation.navigate('Drawer', {
+  screen: 'Profile',
+  params: { userid: `${Tweet.owner}` },
+})}} style={styles.Foto}>
           <Image
         style={styles.tinyLogo}
         source={{
           uri: Tweet.fotoperfil,
         }}
       />
-          </View>
-          
+          </Pressable>
           <View style={styles.info}>
           <Text style={styles.NombreCompleto}>{Tweet.ownername} </Text>
           <Text style={styles.usuario}>@{Tweet.owneruser}</Text>
@@ -71,15 +97,12 @@ const Home = ({route,navigation}) => {
           </View>
         );
       })}
-      
+      <ActivityIndicator style={{marginTop:50}} animating={state} size="large" color="#239EEC" />
       </ScrollView>
-      
 
-      <Pressable onPress={()=>{navigation.navigate('NewTweet',{
-        token:Token,
-        userid:userid
-            })}} style={styles.NewTweet}><Ionicons name="add" size={30} color="white" /></Pressable>
+      <Pressable onPress={()=>{navigation.navigate('NewTweet');}} style={styles.NewTweet}><Ionicons name="add" size={30} color="white" /></Pressable>
     </View>
+    
   )
 }
 
@@ -203,7 +226,16 @@ const styles = StyleSheet.create({
     maxWidth:'101%',
     borderRadius:30,
   },
-  
+  header:{
+    backgroundColor:'#16202A',
+    width:360,
+    height:60,
+    top:0,
+    flex:0,
+    flexWrap:'wrap',
+    borderBottomLeftRadius:10,
+    borderBottomRightRadius:10
+  }
 })
 
 export default Home

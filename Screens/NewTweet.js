@@ -6,15 +6,16 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { firebase, UploadFile } from "../components/config/config";
 import * as ImagePicker from 'expo-image-picker'
 import { Entypo } from '@expo/vector-icons';
-
+import env from '../env';
 
 const NewTweet = ({route,navigation}) => {
 
-  const {userid,Token} = route.params;
   const [image,setImage] = useState(null);
   const [mostrar,setmostrar] = useState(null);
   const [resultadoimagen,setresultadoimagen] = useState(null);
   const [uploading,setUploading] = useState(false);
+
+
 
   let date = new Date()
   let msg ="";
@@ -57,7 +58,7 @@ const NewTweet = ({route,navigation}) => {
           _id:`${userid}`
         })}
       // Similar to componentDidMount and componentDidUpdate:
-      fetch("http://192.168.1.102:3000/finduser",requestOptions)
+      fetch(`${env.SERVER.URI}/finduser`,requestOptions)
       .then(res =>{
         console.log(res.status);
         if (res.status=="400"){
@@ -100,11 +101,12 @@ const NewTweet = ({route,navigation}) => {
       fecha:`${date}`
     })}
       //axios
-      fetch("http://192.168.1.102:3000/newtweet",requestOptions)
+      fetch(`${env.SERVER.URI}/newtweet`,requestOptions)
       console.log('ENVIADO')
       navigation.navigate('Home',{
         userid:userid,
         token:Token,
+        nuevo:true,
       })
       }else{
         const requestOptions = {
@@ -124,22 +126,25 @@ const NewTweet = ({route,navigation}) => {
             fecha:`${date}`
           })}
             //axios
-            fetch("http://192.168.1.102:3000/newtweet",requestOptions)
+            fetch(`${env.SERVER.URI}/newtweet`,requestOptions)
             console.log('ENVIADO')
             navigation.navigate('Home',{
               userid:userid,
               token:Token,
+              nuevo:true
             })
       }
     
      }
-
+     
+  const {userid,Token} = route.params;   
   return (
     <View style={styles.Body}>
       <View style={styles.header}>
         <Pressable onPress={()=>{navigation.navigate('Home',{
         userid:userid,
         token:Token,
+        nuevo:true,
       })}}><Ionicons style={styles.backbutton} name="arrow-back" size={30} color="white" /></Pressable>
         <Text style={styles.Titulo}>Nuevo Tweet</Text>
       </View>
@@ -204,7 +209,9 @@ const styles = StyleSheet.create({
       height:60,
       top:0,
       flex:0,
-      flexWrap:'wrap'
+      flexWrap:'wrap',
+      borderBottomLeftRadius:10,
+      borderBottomRightRadius:10
     },
     backbutton:{
       marginTop:20,

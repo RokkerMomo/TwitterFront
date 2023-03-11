@@ -1,7 +1,7 @@
 import { Button, Pressable, StyleSheet, Text, TextInput, View,Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect,useState } from 'react'
-
+import env from '../env';
 
 
 const button = ({idTweet,userid}) => {
@@ -19,7 +19,7 @@ const button = ({idTweet,userid}) => {
           idUsuario:`${userid}`
         })}
           //axios
-          fetch("http://192.168.1.102:3000/like",requestOptions)
+          fetch(`${env.SERVER.URI}/like`,requestOptions)
           .then(res =>{
             if (res.status=="400"){
               msg="error";
@@ -48,7 +48,7 @@ const button = ({idTweet,userid}) => {
               idTweet:`${idTweet}`
             })}
               //axios
-              fetch("http://192.168.1.102:3000/getlikes",requestOptions)
+              fetch(`${env.SERVER.URI}/getlikes`,requestOptions)
               .then(res =>{
                 if (res.status=="400"){
                   msg="error";
@@ -61,7 +61,6 @@ const button = ({idTweet,userid}) => {
                 console.log(result)
                 }
               )
-              return numero;
     },[])
 
   return (

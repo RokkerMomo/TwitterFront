@@ -9,10 +9,11 @@ import Login from "../Screens/Login";
 import Register from "../Screens/Register";
 import NewTweet from "../Screens/NewTweet";
 import Perfil from "../Screens/Profile";
+import Home2 from "../Screens/Home2";
+import Drawer from "../Screens/Drawer";
 
 
 const Stack = createNativeStackNavigator();
-const Drawer = createDrawerNavigator();
 
 const MainStack = ()=>{
     return(
@@ -20,7 +21,7 @@ const MainStack = ()=>{
 
             <Stack.Navigator screenOptions={{
 
-                headerShown:false,
+                headerShown:true,
                 headerTintColor:'#fff',
                 drawerActiveTintColor:'#16202A',
                 drawerInactiveTintColor:'#FFF',
@@ -44,15 +45,16 @@ const MainStack = ()=>{
 
                 <Stack.Screen
                 name="Register"
+                tittle='Registrar Usuario'
                 options={{
-                    headerShown:false,
+                    headerShown:true,
                     drawerItemStyle: { height: 0 }
                 }}component={Register}></Stack.Screen>
 
                 <Stack.Screen
-                name="Home"
+                name="Drawer"
                 options={{
-                    title: 'Home',
+                    title: 'Drawer',
                     headerRight: () => (
                         <Ionicons style={styles.search} name="ios-search" size={24} color="white" />
                       ),
@@ -62,10 +64,10 @@ const MainStack = ()=>{
                           size={size}
                           color={focused ? '#7cc' : '#ccc'}
                        />
-                    ),headerShown:true,
+                    ),headerShown:false,
                     
                  }}
-                component={Home}></Stack.Screen>
+                component={Drawer}></Stack.Screen>
                 
                 <Stack.Screen
                 name="Perfil"
@@ -100,7 +102,8 @@ const MainStack = ()=>{
                 <Stack.Screen 
                 name="NewTweet"
                 options={{
-                    drawerItemStyle: { height: 0 }
+                    drawerItemStyle: { height: 0 },
+                    headerShown:false
                 }}
                 component={NewTweet}></Stack.Screen>
                 
