@@ -1,22 +1,18 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import {createDrawerNavigator} from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
 import Home from "./Home";
 import Login from "./Login";
-import Register from "./Register";
 import NewTweet from "./NewTweet";
 import Perfil from "./Profile";
-import Home2 from "./Home2";
+
 
 const contenedor = createDrawerNavigator();
 
 const Drawer = ({route, navigation}) => {
-    console.log(route.params);
   return (
-    <contenedor.Navigator screenOptions={{
+    <contenedor.Navigator initialRouteName='Home' backBehavior='initialRoute' screenOptions={{
 
 headerShown:true,
 headerTintColor:'#fff',
@@ -33,8 +29,8 @@ drawerStyle:{
     backgroundColor:'#637885',
 },
 }}>
-      <contenedor.Group>
-    <contenedor.Screen name="Home" initialParams={{ params: route.params }} options={{
+    <contenedor.Screen name="Home" initialParams={{userid: route.params.params.userid}} options={{
+      
     drawerIcon: ({focused, size}) => (
        <Ionicons
           name="md-home"
@@ -43,7 +39,8 @@ drawerStyle:{
        />
     )
     }} component={Home} />
-    <contenedor.Screen name="MyProfile" initialParams={{userid: route.params.params.userid}} options={{
+    <contenedor.Screen name="MyProfile" initialParams={{userid: route.params.params.userid ,profileid:route.params.params.userid}} options={{
+      unmountOnBlur:true,
     drawerIcon: ({focused, size}) => (
        <Ionicons
           name="person"
@@ -53,7 +50,9 @@ drawerStyle:{
     )
     }} component={Perfil} />
 
+
 <contenedor.Screen name="Salir" options={{
+   headerShown:false,
     drawerIcon: ({focused, size}) => (
        <Ionicons
           name="exit"
@@ -62,7 +61,6 @@ drawerStyle:{
        />
     )
     }} component={Login} />
-    </contenedor.Group>
 
 
 

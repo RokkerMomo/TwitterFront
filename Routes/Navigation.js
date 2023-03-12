@@ -1,15 +1,12 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
-import { Button, Pressable, StyleSheet, Text, TextInput, View,Alert } from 'react-native';
-import Home from "../Screens/Home";
+import { StyleSheet } from 'react-native';
 import Login from "../Screens/Login";
 import Register from "../Screens/Register";
 import NewTweet from "../Screens/NewTweet";
 import Perfil from "../Screens/Profile";
-import Home2 from "../Screens/Home2";
 import Drawer from "../Screens/Drawer";
 
 

@@ -35,6 +35,7 @@ const NewTweet = ({route,navigation}) => {
     const pickImage = async () =>{
       // No permissions request is necessary for launching the image library
       let result = await ImagePicker.launchImageLibraryAsync({
+        allowsMultipleSelection:false,
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         aspect: [4, 3],

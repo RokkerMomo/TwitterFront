@@ -13,6 +13,8 @@ const Profile = ({route,navigation}) => {
   const [state,setState] = useState(true)
   const [refreshing, setRefreshing] = React.useState(false);
   const [Datos,setDatos] = useState(null)
+  const [followers,setFollowers] = useState(0)
+  const [check,SetCheck] = useState(null)
   var Data = [];
 
 
@@ -23,6 +25,66 @@ const Profile = ({route,navigation}) => {
     }, 200);
   }, []);
 
+  async function Follow(){
+
+    if (check==true) {
+      SetCheck(false)
+    }else{
+      SetCheck(true)
+    }
+
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        idSeguido:`${userid}`,
+    idSeguidor:`${profileid}`
+      })}
+    // Similar to componentDidMount and componentDidUpdate:
+    await fetch(`${env.SERVER.URI}/follow`,requestOptions)
+    .then(res =>{
+      if (res.status=="400"){
+      }else{}
+      return res.json();
+    }).then(
+      (result) =>{
+        console.log(result)
+      }
+    )
+  }
+
+   async function CheckFollow(){
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+    idSeguido:`${userid}`,
+    idSeguidor:`${profileid}`
+      })}
+    await fetch(`${env.SERVER.URI}/checkfollow`,requestOptions)
+   .then(res =>{
+     if (res.status=="400"){
+     }else{}
+     return res.json();
+   }).then(
+     (result) =>{
+       if (result.status=='true') {
+        SetCheck(true)
+        console.log(check)
+       }else{
+        SetCheck(false)
+        console.log(check)
+       }
+     }
+   )
+  }
 
   async function getTweets (){
     const requestOptions = {
@@ -42,12 +104,34 @@ const Profile = ({route,navigation}) => {
         if (Tweets!==info['Tweets']) {
           setTweets(info["Tweets"])
           setState(false)
-        console.log(Tweets)
         } else {
         }
         
   } );
   };
+
+  async function GetGollowers() {
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        idSeguido:`${userid}`
+      })}
+    // Similar to componentDidMount and componentDidUpdate:
+    fetch(`${env.SERVER.URI}/getfollowers`,requestOptions)
+    .then(res =>{
+      if (res.status=="400"){
+      }else{}
+      return res.json();
+    }).then(
+      (result) =>{
+        setFollowers(result)
+      }
+    )
+  }
 
   async function GetData (){
     const requestOptions = {
@@ -62,27 +146,26 @@ const Profile = ({route,navigation}) => {
     // Similar to componentDidMount and componentDidUpdate:
     fetch(`${env.SERVER.URI}/finduser`,requestOptions)
     .then(res =>{
-      console.log(res.status);
       if (res.status=="400"){
       }else{}
       return res.json();
     }).then(
       (result) =>{
         setDatos(result);
-        console.log(Datos);
       }
     )
   }
 
   useEffect(() => {
-
-    GetData();
-    getTweets();
     
+    GetData();
+    GetGollowers();
+    getTweets();
+    CheckFollow();
     
   },[refreshing]);
 
-  const {userid,Token} = route.params;
+  const {userid,profileid,Token} = route.params;
   return (
 
     <View style={styles.Body}>
@@ -105,17 +188,21 @@ const Profile = ({route,navigation}) => {
           <Text style={styles.NombreCompleto}>{Datos&&Datos.nombre} {Datos&&Datos.apellido}</Text>
           <Text style={styles.usuario}>@{Datos&&Datos.usuario}</Text>
           </View>
-          {Datos&&Datos._id &&(userid==Datos._id) && <Pressable style={styles.send}>
+          {(userid==profileid) && <Pressable style={styles.send}>
         <Text>Editar Perfil</Text>
         </Pressable>}
-        { Datos&&Datos._id &&(userid!==Datos._id) && <Pressable style={styles.send}>
-        <Text>Seguir</Text>
+
+        {(userid!=profileid) && <Pressable onPress={()=>{Follow()}} style={styles.send}>
+
+        {(check==true) &&<Text>Siguiendo</Text>}
+        {(check==false) &&<Text>Seguir</Text>}
+
         </Pressable>}
         <Text style={styles.bio}>{Datos&&Datos.bio}</Text>
           </View>
           <View style={styles.footerperfil}>
             <Text style={styles.NombreCompleto}>220 </Text><Text style={styles.usuario}>Siguiendo </Text>
-            <Text style={styles.NombreCompleto}>14 </Text><Text style={styles.usuario}>Seguidores</Text>
+            <Text style={styles.NombreCompleto}>{followers}</Text><Text style={styles.usuario}>Seguidores</Text>
           </View>
           </View>
         

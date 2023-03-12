@@ -1,5 +1,5 @@
 import { Button, Pressable, StyleSheet, Text, View,
-ScrollView,Image,RefreshControl,ActivityIndicator} from 'react-native';
+ScrollView,Image,RefreshControl,ActivityIndicator,Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
@@ -10,6 +10,8 @@ const Home = ({route,navigation}) => {
 
   const [Tweets,setTweets] = useState(null)
   const [state,setState] = useState(true)
+  const hasUnsavedChanges = Boolean(true);
+  const [check,SetCheck] = useState(null)
   const [refreshing, setRefreshing] = React.useState(false);
   var Data = [];
 
@@ -40,7 +42,6 @@ const Home = ({route,navigation}) => {
         if (Tweets!==info['Tweets']) {
           setTweets(info["Tweets"])
           setState(false)
-        console.log(Tweets)
         } else {
         }
         
@@ -48,10 +49,33 @@ const Home = ({route,navigation}) => {
   };
 
   useEffect(() => {
+    navigation.addListener('beforeRemove', (e) => {
+      if (!hasUnsavedChanges) {
+        // If we don't have unsaved changes, then we don't need to do anything
+        return;
+      }
 
+      // Prevent default behavior of leaving the screen
+      e.preventDefault();
+
+      // Prompt the user before leaving the screen
+      Alert.alert(
+        'Cerrar Sesion?',
+        'Quieres volver a la pantalla de inicio y cerrar tu sesion ?',
+        [
+          { text: "No salir", style: 'cancel', onPress: () => {} },
+          {
+            text: 'Salir',
+            style: 'destructive',
+            // If the user confirmed, then we dispatch the action we blocked earlier
+            // This will continue the action that had triggered the removal of the screen
+            onPress: () => navigation.dispatch(e.data.action),
+          },
+        ]
+      );
+    }),
     
     getTweets();
-    
   },[refreshing]);
 
   const {userid,Token} = route.params;
@@ -62,16 +86,14 @@ const Home = ({route,navigation}) => {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
-        
       {Tweets&&Tweets.map((Tweet) => {
         const fecha = Tweet.fecha.slice(0, 10);
         return (
-          
           <View key={Tweet._id} style={styles.Carta}>
           <View style={styles.contenido}>
           <Pressable onPress={()=>{navigation.navigate('Drawer', {
   screen: 'Profile',
-  params: { userid: `${Tweet.owner}` },
+  params: { userid: `${Tweet.owner}`,profileid: userid },
 })}} style={styles.Foto}>
           <Image
         style={styles.tinyLogo}

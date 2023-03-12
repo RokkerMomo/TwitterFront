@@ -6,8 +6,47 @@ import env from '../env';
 
 const button = ({idTweet,userid}) => {
     const [numero,setnumero] = useState(0)
+    const [check,SetCheck] = useState(false)
+
+    async function CheckLike(){
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          idTweet:`${idTweet}`,
+          idUsuario:`${userid}`
+        })}
+      await fetch(`${env.SERVER.URI}/checklike`,requestOptions)
+     .then(res =>{
+       if (res.status=="400"){
+       }else{}
+       return res.json();
+     }).then(
+       (result) =>{
+         if (result.status=='true') {
+          SetCheck(true)
+          console.log(check)
+         }else{
+          SetCheck(false)
+          console.log(check)
+         }
+       }
+     )
+    }
+
+
 
     const darLike = ()=>{
+
+      if (check==true) {
+        SetCheck(false)
+      }else{
+        SetCheck(true)
+      }
+
       const requestOptions = {
         method: 'POST',
         headers: {
@@ -27,7 +66,6 @@ const button = ({idTweet,userid}) => {
             return res.json();
           }).then(
             (result) =>{
-              console.log(result.msg)
             if (result.msg=="Se dio like") {
               setnumero(numero+1)
             }else{
@@ -57,14 +95,17 @@ const button = ({idTweet,userid}) => {
               }).then(
                 (result) =>{
                 setnumero(result)
-                console.log('AQUI ESTA EL NUMERO')
-                console.log(result)
                 }
               )
+              CheckLike();
     },[])
 
   return (
-    <Pressable onPress={()=>{darLike()}} style={styles.heart}><Ionicons  name="heart-outline" size={20} color="white" /><Text style={styles.number}>{numero}</Text></Pressable>
+    <Pressable onPress={()=>{darLike()}} style={styles.heart}>
+      {(check==false)&&<Ionicons  name="heart-outline" size={20} color="white" />}
+      {(check==true)&&<Ionicons name="heart" size={20} color="red" />}
+      
+      <Text style={styles.number}>{numero}</Text></Pressable>
   )
 }
 
