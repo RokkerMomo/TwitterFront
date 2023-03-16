@@ -3,9 +3,12 @@ import React from 'react'
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
 import Home from "./Home";
-import Login from "./Login";
 import NewTweet from "./NewTweet";
 import Perfil from "./Profile";
+import EditProfile from "./EditProfile";
+import Following from "./Following";
+import comments from "./comments";
+import button from "../components/button";
 
 
 const contenedor = createDrawerNavigator();
@@ -39,6 +42,19 @@ drawerStyle:{
        />
     )
     }} component={Home} />
+
+<contenedor.Screen name="Following" initialParams={{userid: route.params.params.userid}} options={{
+      unmountOnBlur:true,
+      drawerIcon: ({focused, size}) => (
+         <Ionicons
+            name="ios-star"
+            size={size}
+            color={focused ? '#7cc' : '#ccc'}
+         />
+      )
+      }} component={Following} />
+
+
     <contenedor.Screen name="MyProfile" initialParams={{userid: route.params.params.userid ,profileid:route.params.params.userid}} options={{
       unmountOnBlur:true,
     drawerIcon: ({focused, size}) => (
@@ -50,22 +66,23 @@ drawerStyle:{
     )
     }} component={Perfil} />
 
-
-<contenedor.Screen name="Salir" options={{
-   headerShown:false,
+<contenedor.Screen name="EditProfile" initialParams={{userid: route.params.params.userid ,profileid:route.params.params.userid}} options={{
+      unmountOnBlur:true,
+      drawerItemStyle:{height:0},
     drawerIcon: ({focused, size}) => (
        <Ionicons
-          name="exit"
+          name="person"
           size={size}
           color={focused ? '#7cc' : '#ccc'}
        />
     )
-    }} component={Login} />
-
+    }} component={EditProfile} />
 
 
     <contenedor.Screen name="Profile" initialParams={{userid: route.params.params.userid}} options={{
       unmountOnBlur:true,drawerItemStyle:{height:0}}} component={Perfil} />
+
+      
 
       <contenedor.Screen name='NewTweet' options={{
                     drawerItemStyle: { height: 0 },
@@ -73,6 +90,21 @@ drawerStyle:{
                     unmountOnBlur:true
                 }} 
                 initialParams={{userid: route.params.params.userid}} component={NewTweet}/>
+
+
+<contenedor.Screen name='comments' options={{
+                    drawerItemStyle: { height: 0 },
+                    headerShown:false,
+                    unmountOnBlur:true
+                }} 
+                initialParams={{userid: route.params.params.userid}} component={comments}/>
+
+<contenedor.Screen name='button' options={{
+                    drawerItemStyle: { height: 0 },
+                    headerShown:false,
+                    unmountOnBlur:true
+                }} 
+               component={button}/>
 
       
 

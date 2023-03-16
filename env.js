@@ -1,5 +1,10 @@
 export default {
     SERVER:{
-        URI: "http://192.168.1.103:3000",
+        URI: "https://twitterbackend-production-ae1c.up.railway.app",
     }
 }
+
+
+//local http://localhost:3000
+//railway https://twitterbackend-production-ae1c.up.railway.app
+//iplocal 192.168.1.106

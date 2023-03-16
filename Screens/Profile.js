@@ -14,6 +14,7 @@ const Profile = ({route,navigation}) => {
   const [refreshing, setRefreshing] = React.useState(false);
   const [Datos,setDatos] = useState(null)
   const [followers,setFollowers] = useState(0)
+  const [following,setFollowing] = useState(0)
   const [check,SetCheck] = useState(null)
   var Data = [];
 
@@ -41,8 +42,8 @@ const Profile = ({route,navigation}) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        idSeguido:`${userid}`,
-    idSeguidor:`${profileid}`
+        idSeguido:`${profileid}`,
+    idSeguidor:`${userid}`
       })}
     // Similar to componentDidMount and componentDidUpdate:
     await fetch(`${env.SERVER.URI}/follow`,requestOptions)
@@ -65,8 +66,8 @@ const Profile = ({route,navigation}) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-    idSeguido:`${userid}`,
-    idSeguidor:`${profileid}`
+    idSeguido:`${profileid}`,
+    idSeguidor:`${userid}`
       })}
     await fetch(`${env.SERVER.URI}/checkfollow`,requestOptions)
    .then(res =>{
@@ -77,10 +78,8 @@ const Profile = ({route,navigation}) => {
      (result) =>{
        if (result.status=='true') {
         SetCheck(true)
-        console.log(check)
        }else{
         SetCheck(false)
-        console.log(check)
        }
      }
    )
@@ -94,7 +93,7 @@ const Profile = ({route,navigation}) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        owner:`${userid}`
+        owner:`${profileid}`
       })}
   await fetch(`${env.SERVER.URI}/showuserTweets`,requestOptions)
   .then((response) => response.json())
@@ -118,7 +117,7 @@ const Profile = ({route,navigation}) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        idSeguido:`${userid}`
+        idSeguido:`${profileid}`
       })}
     // Similar to componentDidMount and componentDidUpdate:
     fetch(`${env.SERVER.URI}/getfollowers`,requestOptions)
@@ -133,6 +132,29 @@ const Profile = ({route,navigation}) => {
     )
   }
 
+  async function GetFollowing() {
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        idSeguidor:`${profileid}`
+      })}
+    // Similar to componentDidMount and componentDidUpdate:
+    fetch(`${env.SERVER.URI}/getFollowing`,requestOptions)
+    .then(res =>{
+      if (res.status=="400"){
+      }else{}
+      return res.json();
+    }).then(
+      (result) =>{
+        setFollowing(result)
+      }
+    )
+  }
+
   async function GetData (){
     const requestOptions = {
       method: 'POST',
@@ -141,7 +163,7 @@ const Profile = ({route,navigation}) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        _id:`${userid}`
+        _id:`${profileid}`
       })}
     // Similar to componentDidMount and componentDidUpdate:
     fetch(`${env.SERVER.URI}/finduser`,requestOptions)
@@ -159,6 +181,7 @@ const Profile = ({route,navigation}) => {
   useEffect(() => {
     
     GetData();
+    GetFollowing();
     GetGollowers();
     getTweets();
     CheckFollow();
@@ -184,11 +207,11 @@ const Profile = ({route,navigation}) => {
         }}
       />
           </View>
-          <View style={styles.info}>
+          <View style={styles.infoperfil}>
           <Text style={styles.NombreCompleto}>{Datos&&Datos.nombre} {Datos&&Datos.apellido}</Text>
           <Text style={styles.usuario}>@{Datos&&Datos.usuario}</Text>
           </View>
-          {(userid==profileid) && <Pressable style={styles.send}>
+          {(userid==profileid) && <Pressable onPress={()=>{navigation.navigate('EditProfile');}} style={styles.send}>
         <Text>Editar Perfil</Text>
         </Pressable>}
 
@@ -201,8 +224,8 @@ const Profile = ({route,navigation}) => {
         <Text style={styles.bio}>{Datos&&Datos.bio}</Text>
           </View>
           <View style={styles.footerperfil}>
-            <Text style={styles.NombreCompleto}>220 </Text><Text style={styles.usuario}>Siguiendo </Text>
-            <Text style={styles.NombreCompleto}>{followers}</Text><Text style={styles.usuario}>Seguidores</Text>
+            <Text style={styles.NombreCompleto}>{following} </Text><Text style={styles.usuario}>Siguiendo </Text>
+            <Text style={styles.NombreCompleto}>{followers} </Text><Text style={styles.usuario}>Seguidores</Text>
           </View>
           </View>
         
@@ -232,21 +255,14 @@ const Profile = ({route,navigation}) => {
           <Text style={styles.input}>{Tweet.descripcion}</Text>
           {(Tweet.foto!=="undefined") && <Image source={{ uri: Tweet.foto }} style={{ width: 310, height: 310, position:'relative', marginBottom:5, borderRadius:10 }} />}
           </View>
-          <View style={styles.footer}>
-          <Pressable style={styles.heart}><AntDesign name="message1" size={20} color="white" /><Text style={styles.number}> 25</Text></Pressable>
+
           <Like idTweet={Tweet._id} userid={userid}></Like>
-          </View>
           
           </View>
         );
       })}
       <ActivityIndicator style={{marginTop:50}} animating={state} size="large" color="#239EEC" />
       </ScrollView>
-
-      <Pressable onPress={()=>{navigation.navigate('NewTweet', {
-  screen: 'NewTweet',
-  params: { userid: userid },
-});}} style={styles.NewTweet}><Ionicons name="add" size={30} color="white" /></Pressable>
     </View>
     
   )
@@ -294,14 +310,14 @@ const styles = StyleSheet.create({
   },
   Carta:{
     backgroundColor:'#16202A',
-    width:350,
+    width:'98%',
     borderRadius:10,
     paddingTop:16,
     paddingRight:20,
     paddingLeft:20,
     paddingBottom:5,
     marginTop:10,
-    left:5,
+    left:'1%',
     flex:0,
     display:"flex",
   },
@@ -359,6 +375,11 @@ const styles = StyleSheet.create({
     alignItems:"center"
   },
   info:{
+    width:180,
+    flexWrap:'wrap',
+    flexDirection:'row'
+  },
+  infoperfil:{
     width:150,
     flexWrap:'wrap',
     flexDirection:'row'

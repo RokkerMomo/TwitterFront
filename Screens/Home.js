@@ -1,7 +1,6 @@
 import { Button, Pressable, StyleSheet, Text, View,
 ScrollView,Image,RefreshControl,ActivityIndicator,Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import Like from "../components/button";
 import env from '../env';
@@ -41,6 +40,7 @@ const Home = ({route,navigation}) => {
         const info = Data[0];
         if (Tweets!==info['Tweets']) {
           setTweets(info["Tweets"])
+          console.log(Tweets&&Tweets)
           setState(false)
         } else {
         }
@@ -89,11 +89,17 @@ const Home = ({route,navigation}) => {
       {Tweets&&Tweets.map((Tweet) => {
         const fecha = Tweet.fecha.slice(0, 10);
         return (
-          <View key={Tweet._id} style={styles.Carta}>
+          <Pressable onPress={()=>{navigation.navigate('Drawer', {
+            screen: 'comments',
+            params: { idTweet: `${Tweet._id}`,userid: userid },
+          })}} key={Tweet._id} style={styles.Carta}>
+         
+         
           <View style={styles.contenido}>
+           
           <Pressable onPress={()=>{navigation.navigate('Drawer', {
   screen: 'Profile',
-  params: { userid: `${Tweet.owner}`,profileid: userid },
+  params: { profileid: `${Tweet.owner}`,userid: userid },
 })}} style={styles.Foto}>
           <Image
         style={styles.tinyLogo}
@@ -107,16 +113,15 @@ const Home = ({route,navigation}) => {
           <Text style={styles.usuario}>@{Tweet.owneruser}</Text>
           </View>
 
-          <Text style={styles.usuario}>{fecha }</Text>
+          <Text style={styles.usuario}>{fecha}</Text>
           <Text style={styles.input}>{Tweet.descripcion}</Text>
           {(Tweet.foto!=="undefined") && <Image source={{ uri: Tweet.foto }} style={{ width: 310, height: 310, position:'relative', marginBottom:5, borderRadius:10 }} />}
           </View>
-          <View style={styles.footer}>
-          <Pressable style={styles.heart}><AntDesign name="message1" size={20} color="white" /><Text style={styles.number}> 25</Text></Pressable>
-          <Like idTweet={Tweet._id} userid={userid}></Like>
-          </View>
+
           
-          </View>
+          <Like idTweet={Tweet._id} userid={userid}></Like>
+          
+          </Pressable>
         );
       })}
       <ActivityIndicator style={{marginTop:50}} animating={state} size="large" color="#239EEC" />
@@ -164,14 +169,14 @@ const styles = StyleSheet.create({
   },
   Carta:{
     backgroundColor:'#16202A',
-    width:350,
+    width:'98%',
     borderRadius:10,
     paddingTop:16,
     paddingRight:20,
     paddingLeft:20,
     paddingBottom:5,
     marginTop:10,
-    left:5,
+    left:'1%',
     flex:0,
     display:"flex",
   },

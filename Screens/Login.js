@@ -57,8 +57,9 @@ const Login = ({navigation}) => {
      
   return (
     <View style={styles.Body}>
-        <Text style={styles.Titulo}> Inicio De Sesion </Text>
+       
         <View style={styles.Carta}>
+        <Text style={styles.Titulo}> Inicio de sesión</Text>
           <TextInput onChangeText={(value) => setstate({...state, usuario:value})} placeholder='Usuario' style={styles.Input}></TextInput>
           <TextInput onChangeText={(value) => setstate({...state, password:value})} secureTextEntry={true} placeholder='Password' style={styles.Input}></TextInput>
           <Pressable onPress={()=>{ingresar(state.usuario,state.password)}} style={({pressed}) => [
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
     Carta:{
       backgroundColor:'#16202A',
       width:281,
-      height:213,
+      height:250,
       borderRadius:10,
       paddingTop:16,
       paddingRight:20,
@@ -139,8 +140,7 @@ const styles = StyleSheet.create({
     Registro:{
       width:103,
       height:35,
-      color:'#0699F0',
-      borderColor:'#0699F0',
+      borderColor:'#239EEC',
       borderRadius:5,
       borderWidth:1,
       alignItems: 'center',
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     },
     
     textRegistro:{
-      color:'#0699F0',
+      color:'#239EEC',
     },
     
 })

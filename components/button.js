@@ -1,11 +1,13 @@
-import { Button, Pressable, StyleSheet, Text, TextInput, View,Alert, ScrollView } from 'react-native';
+import {  Pressable, StyleSheet, Text, TextInput, View,Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import React, { useEffect,useState } from 'react'
 import env from '../env';
 
 
-const button = ({idTweet,userid}) => {
+const Button = ({idTweet,userid,route,navigation}) => {
     const [numero,setnumero] = useState(0)
+    const [numerocomentario,setNumerocomentario] = useState(0)
     const [check,SetCheck] = useState(false)
 
     async function CheckLike(){
@@ -28,13 +30,35 @@ const button = ({idTweet,userid}) => {
        (result) =>{
          if (result.status=='true') {
           SetCheck(true)
-          console.log(check)
          }else{
           SetCheck(false)
-          console.log(check)
          }
        }
      )
+    }
+
+
+    const getcomentarios = ()=>{
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          idTweet:`${idTweet}`,
+        })}
+        fetch(`${env.SERVER.URI}/getcomentariosnumber`,requestOptions)
+        .then(res =>{
+          if (res.status=="400"){
+            msg="error";
+          }else{}
+          return res.json();
+        }).then(
+          (result) =>{
+          setNumerocomentario(result);
+          }
+        )
     }
 
 
@@ -97,19 +121,29 @@ const button = ({idTweet,userid}) => {
                 setnumero(result)
                 }
               )
+              getcomentarios();
               CheckLike();
     },[])
 
   return (
-    <Pressable onPress={()=>{darLike()}} style={styles.heart}>
+    <View style={styles.footer}>
+
+
+<Pressable style={styles.heart}>
+  <AntDesign name="message1" size={20} color="white" />
+  <Text style={styles.number}> {numerocomentario}</Text></Pressable>
+
+<Pressable onPress={()=>{darLike()}} style={styles.heart}>
       {(check==false)&&<Ionicons  name="heart-outline" size={20} color="white" />}
       {(check==true)&&<Ionicons name="heart" size={20} color="red" />}
       
-      <Text style={styles.number}>{numero}</Text></Pressable>
+      <Text style={styles.number}> {numero}</Text></Pressable>
+    </View>
+    
   )
 }
 
-export default button
+export default Button
 
 const styles = StyleSheet.create({
     Body:{
@@ -162,8 +196,9 @@ const styles = StyleSheet.create({
     heart:{
       position:"relative",
       height:40,
-      width:40,
+      width:50,
       flexWrap:'wrap',
+      flexDirection:'row',
       marginLeft:5
     },
     number:{
@@ -214,6 +249,12 @@ const styles = StyleSheet.create({
       borderRadius:30,
       left:'80%',
       top:'87%',
+    },
+    footer:{
+      height:25,
+      flex:0,
+      flexWrap:"wrap",
+      paddingLeft:"65%"
     }
     
   })
