@@ -133,10 +133,6 @@ const Button = ({idTweet,userid,token}) => {
     <View style={styles.footer}>
 
 
-<View style={styles.heart}>
-  <AntDesign name="message1" size={20} color="white" />
-  <Text style={styles.number}> {numerocomentario}</Text></View>
-
 <Pressable onPress={()=>{darLike()}} style={styles.heart}>
       {(check==false)&&<Ionicons  name="heart-outline" size={20} color="white" />}
       {(check==true)&&<Ionicons name="heart" size={20} color="red" />}
@@ -203,7 +199,7 @@ const styles = StyleSheet.create({
       width:50,
       flexWrap:'wrap',
       flexDirection:'row',
-      marginLeft:5
+      marginLeft:'50%'
     },
     number:{
       color:'white'

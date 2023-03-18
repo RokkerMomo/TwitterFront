@@ -1,5 +1,5 @@
 import { Button, Pressable, StyleSheet, Text, View,
-  ScrollView,Image,RefreshControl,ActivityIndicator} from 'react-native';
+  ScrollView,Image,RefreshControl,ActivityIndicator,Alert} from 'react-native';
   import { Ionicons } from '@expo/vector-icons';
   import { AntDesign } from '@expo/vector-icons';
   import React, { useState, useEffect } from 'react';
@@ -7,6 +7,32 @@ import { Button, Pressable, StyleSheet, Text, View,
   import env from '../env';
 
 const Profile = ({route,navigation}) => {
+
+  const createTwoButtonAlert = (idtweet) =>
+    Alert.alert('Alerta', 'Seguro que quieres borrar este Tweet', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {text: 'Borrar', onPress: () => {const requestOptions = {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization':`Bearer ${Token}`
+        },
+        body: JSON.stringify({
+          idTweet:`${idtweet}`
+        })}
+    fetch(`${env.SERVER.URI}/deleteTweet`,requestOptions)
+    .then((response) => response.json())
+    .then((data) =>{
+      console.log(data)
+      setRefreshing(true)
+          
+    } );}},
+    ]);
 
   
   const [Tweets,setTweets] = useState(null)
@@ -40,6 +66,7 @@ const Profile = ({route,navigation}) => {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'Authorization':`Bearer ${Token}`
       },
       body: JSON.stringify({
         idSeguido:`${profileid}`,
@@ -64,6 +91,7 @@ const Profile = ({route,navigation}) => {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'Authorization':`Bearer ${Token}`
       },
       body: JSON.stringify({
     idSeguido:`${profileid}`,
@@ -91,6 +119,7 @@ const Profile = ({route,navigation}) => {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'Authorization':`Bearer ${Token}`
       },
       body: JSON.stringify({
         owner:`${profileid}`
@@ -103,6 +132,7 @@ const Profile = ({route,navigation}) => {
         if (Tweets!==info['Tweets']) {
           setTweets(info["Tweets"])
           setState(false)
+          setRefreshing(false)
         } else {
         }
         
@@ -115,6 +145,7 @@ const Profile = ({route,navigation}) => {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'Authorization':`Bearer ${Token}`
       },
       body: JSON.stringify({
         idSeguido:`${profileid}`
@@ -138,6 +169,7 @@ const Profile = ({route,navigation}) => {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'Authorization':`Bearer ${Token}`
       },
       body: JSON.stringify({
         idSeguidor:`${profileid}`
@@ -161,6 +193,7 @@ const Profile = ({route,navigation}) => {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'Authorization':`Bearer ${Token}`
       },
       body: JSON.stringify({
         _id:`${profileid}`
@@ -211,7 +244,10 @@ const Profile = ({route,navigation}) => {
           <Text style={styles.NombreCompleto}>{Datos&&Datos.nombre} {Datos&&Datos.apellido}</Text>
           <Text style={styles.usuario}>@{Datos&&Datos.usuario}</Text>
           </View>
-          {(userid==profileid) && <Pressable onPress={()=>{navigation.navigate('EditProfile');}} style={styles.send}>
+          {(userid==profileid) && <Pressable onPress={()=>{navigation.navigate('Drawer', {
+            screen: 'EditProfile',
+            params: { userid: userid,Token:Token },
+          })}} style={styles.send}>
         <Text>Editar Perfil</Text>
         </Pressable>}
 
@@ -251,12 +287,13 @@ const Profile = ({route,navigation}) => {
           <Text style={styles.usuario}>@{Tweet.owneruser}</Text>
           </View>
 
-          <Text style={styles.usuario}>{fecha }</Text>
+          <Text style={styles.fecha}> {fecha}</Text>
+          {(Tweet.owner==userid) &&<Pressable onPress={()=>{createTwoButtonAlert(Tweet._id)}} style={{marginLeft:'10%'}}><Ionicons name="ios-trash" size={20} color="red" /></Pressable>}
+          
+          </View>
           <Text style={styles.input}>{Tweet.descripcion}</Text>
           {(Tweet.foto!=="undefined") && <Image source={{ uri: Tweet.foto }} style={{ width: 310, height: 310, position:'relative', marginBottom:5, borderRadius:10 }} />}
-          </View>
-
-          <Like idTweet={Tweet._id} userid={userid}></Like>
+          <Like idTweet={Tweet._id} userid={userid} token={Token}></Like>
           
           </View>
         );
@@ -366,6 +403,10 @@ const styles = StyleSheet.create({
   usuario:{
     color:'#909090'
   },
+  fecha:{
+    color:'#909090',
+  },
+
   Foto:{
     width:50,
     height:50,
@@ -397,6 +438,134 @@ const styles = StyleSheet.create({
     width:200,
     marginLeft:55
 
+  },
+  
+  NewTweet:{
+    position:"absolute",
+    backgroundColor:'#239EEC',
+    height:60,
+    width:60,
+    justifyContent:"center",
+    alignItems:"center",
+    borderRadius:30,
+    left:'80%',
+    top:'87%',
+  },
+  tinyLogo: {
+    position:"relative",
+    width: 50,
+    height: 50,
+    maxHeight:'101%',
+    maxWidth:'101%',
+    borderRadius:30,
+  },
+  header:{
+    backgroundColor:'#16202A',
+    width:360,
+    height:60,
+    top:0,
+    flex:0,
+    flexWrap:'wrap',
+    borderBottomLeftRadius:10,
+    borderBottomRightRadius:10
+  },Body:{
+    flex:1,
+      backgroundColor: '#637885',
+  
+    },
+  Titulo:{
+    color: '#FFFFFF',
+    fontSize:24,
+    fontWeight:"bold",
+    marginTop:20,
+
+  
+  
+  },
+  header:{
+    backgroundColor:'#16202A',
+    width:360,
+    height:60,
+    top:0,
+    flex:0,
+    flexWrap:'wrap'
+  },
+  footer:{
+    height:25,
+    flex:0,
+    flexWrap:"wrap",
+    paddingLeft:"65%"
+  },
+
+  backbutton:{
+    marginTop:20,
+    marginLeft:10,
+  },
+  Carta:{
+    backgroundColor:'#16202A',
+    width:'98%',
+    borderRadius:10,
+    paddingTop:16,
+    paddingRight:20,
+    paddingLeft:20,
+    paddingBottom:5,
+    marginTop:10,
+    left:'1%',
+    flex:0,
+    display:"flex",
+  },
+  contenido:{
+    flex:0,
+    flexWrap:'wrap',
+    flexDirection:'row'
+  
+  
+  },
+  heart:{
+    position:"relative",
+    height:40,
+    width:40,
+    flexWrap:'wrap',
+    flexDirection:'row'
+  },
+  number:{
+    color:'white'
+  },
+  send:{
+    position:'relative',
+    backgroundColor:'white',
+    width:98,
+    height:35,
+    borderRadius:15,
+    borderColor:'black',
+    borderWidth:2,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  NombreCompleto:{
+    color:'white'
+  },
+  usuario:{
+    color:'#909090'
+  },
+  Foto:{
+    width:50,
+    height:50,
+    borderRadius:30,
+    marginRight:8,
+    justifyContent:'center',
+    alignItems:"center"
+  },
+  info:{
+    width:125,
+    flexWrap:'wrap',
+    flexDirection:'row'
+  },
+  input:{
+    color:"white",
+    marginTop:10,
+    marginLeft:10,
+    marginBottom:10,
   },
   
   NewTweet:{

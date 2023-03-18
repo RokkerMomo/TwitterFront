@@ -31,7 +31,11 @@ const Register = ({navigation}) => {
   }
 
   const uploadImage = async (name,LastName,user,pass,bio) =>{
-    setUploading(true);
+    if (image==null) {
+      msg='necesitas agregar una imagen a tu perfil para poder continuar'
+      createTwoButtonAlert();
+    }else{
+      setUploading(true);
     const response = await fetch(image.uri)
     const blob = await response.blob();
     const filename = image.uri.substring(image.uri.lastIndexOf('/')+1);
@@ -72,6 +76,8 @@ const Register = ({navigation}) => {
       }
       
     )
+    }
+    
   }
 
   let msg ="";

@@ -1,44 +1,18 @@
 import { Button, Pressable, StyleSheet, Text, View,
-ScrollView,Image,RefreshControl,ActivityIndicator,Alert} from 'react-native';
+ScrollView,Image,RefreshControl,ActivityIndicator,Alert, TextInput} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SimpleLineIcons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import Like from "../components/button";
 import env from '../env';
 
-const Home = ({route,navigation}) => {
-
-  const createTwoButtonAlert = (idtweet) =>
-    Alert.alert('Alerta', 'Seguro que quieres borrar este Tweet', [
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      },
-      {text: 'Borrar', onPress: () => {const requestOptions = {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization':`Bearer ${Token}`
-        },
-        body: JSON.stringify({
-          idTweet:`${idtweet}`
-        })}
-    fetch(`${env.SERVER.URI}/deleteTweet`,requestOptions)
-    .then((response) => response.json())
-    .then((data) =>{
-      console.log(data)
-      setRefreshing(true)
-          
-    } );}},
-    ]);
+const Search = ({route,navigation}) => {
 
   const [Tweets,setTweets] = useState(null)
   const [state,setState] = useState(true)
   const hasUnsavedChanges = Boolean(true);
   const [check,SetCheck] = useState(null)
   const [refreshing, setRefreshing] = React.useState(false);
+  const [busqueda,onChangeBusqueda] = useState(null)
   var Data = [];
 
 
@@ -59,9 +33,9 @@ const Home = ({route,navigation}) => {
         'Authorization':`Bearer ${Token}`
       },
       body: JSON.stringify({
-        owner:`${userid}`
+        descripcion:`${busqueda}`
       })}
-  await fetch(`${env.SERVER.URI}/showalltweets`,requestOptions)
+  await fetch(`${env.SERVER.URI}/search`,requestOptions)
   .then((response) => response.json())
   .then((data) =>{
     Data= [...Data,data];
@@ -70,7 +44,6 @@ const Home = ({route,navigation}) => {
           setTweets(info["Tweets"])
           console.log(Tweets&&Tweets)
           setState(false)
-    setRefreshing(false)
         } else {
         }
         
@@ -78,43 +51,31 @@ const Home = ({route,navigation}) => {
   };
 
   useEffect(() => {
-    navigation.addListener('beforeRemove', (e) => {
-      if (!hasUnsavedChanges) {
-        // If we don't have unsaved changes, then we don't need to do anything
-        return;
-      }
-
-      // Prevent default behavior of leaving the screen
-      e.preventDefault();
-
-      // Prompt the user before leaving the screen
-      Alert.alert(
-        'Cerrar Sesion?',
-        'Quieres volver a la pantalla de inicio y cerrar tu sesion ?',
-        [
-          { text: "No salir", style: 'cancel', onPress: () => {} },
-          {
-            text: 'Salir',
-            style: 'destructive',
-            // If the user confirmed, then we dispatch the action we blocked earlier
-            // This will continue the action that had triggered the removal of the screen
-            onPress: () => navigation.dispatch(e.data.action),
-          },
-        ]
-      );
-    }),
-    
-    getTweets();
+    setState(false)
   },[refreshing]);
 
   const {userid,Token} = route.params;
   return (
 
     <View style={styles.Body}>
+        
       <ScrollView
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
+
+<View style={styles.header}>
+        <Pressable onPress={()=>{navigation.navigate('Home',{
+        userid:userid,
+        Token:Token,
+        nuevo:true,
+      })}}><Ionicons style={styles.backbutton} name="arrow-back" size={30} color="white" /></Pressable>
+        <Text style={styles.Titulo}>Busqueda</Text>
+        <Pressable onPress={()=>{getTweets()}} ><Ionicons style={styles.search} name="ios-search" size={24} color="white" /></Pressable>
+        
+        <TextInput onChangeText={onChangeBusqueda} value={busqueda} style={styles.input} placeholder='Busca Aqui' placeholderTextColor={'white'}></TextInput>
+      </View>
+        
       {Tweets&&Tweets.map((Tweet) => {
         const fecha = Tweet.fecha.slice(0, 10);
         return (
@@ -122,7 +83,7 @@ const Home = ({route,navigation}) => {
 
           <Pressable onPress={()=>{navigation.navigate('Drawer', {
             screen: 'comments',
-            params: { idTweet: `${Tweet._id}`,userid: userid,Token:Token },
+            params: { idTweet: `${Tweet._id}`,userid: userid },
           })}} key={Tweet._id} style={styles.Carta}>
          
          
@@ -130,7 +91,7 @@ const Home = ({route,navigation}) => {
            
           <Pressable onPress={()=>{navigation.navigate('Drawer', {
   screen: 'Profile',
-  params: { profileid: `${Tweet.owner}`,userid: userid,Token:`${Token}` },
+  params: { profileid: `${Tweet.owner}`,userid: userid },
 })}} style={styles.Foto}>
           <Image
         style={styles.tinyLogo}
@@ -144,28 +105,15 @@ const Home = ({route,navigation}) => {
           <Text style={styles.usuario}>@{Tweet.owneruser}</Text>
           </View>
 
-          <Text style={styles.usuario}> {fecha}</Text>
-
-
-
-          
-          {(Tweet.owner==userid) &&<Pressable onPress={()=>{createTwoButtonAlert(Tweet._id)}} style={{marginLeft:'10%'}}><Ionicons name="ios-trash" size={20} color="red" /></Pressable>}
-         
-         
-         
-         
-         
-         
+          <Text style={styles.usuario}>{fecha}</Text>
           </View>
-
-
 
           <Text style={styles.input}>{Tweet.descripcion}</Text>
           {(Tweet.foto!=="undefined") && <Image source={{ uri: Tweet.foto }} style={{ width: '100%', height: 310, marginBottom:5, borderRadius:10,position:'relative' }} />}
           
 
           
-          <Like idTweet={Tweet._id} userid={userid} token={Token}></Like>
+          <Like idTweet={Tweet._id} userid={userid}></Like>
           
           </Pressable>
         );
@@ -175,10 +123,7 @@ const Home = ({route,navigation}) => {
       <ActivityIndicator style={{marginTop:50}} animating={state} size="large" color="#239EEC" />
       </ScrollView>
 
-      <Pressable onPress={()=>{navigation.navigate('Drawer', {
-            screen: 'NewTweet',
-            params: {userid: userid,Token:Token },
-          })}} style={styles.NewTweet}><Ionicons name="add" size={30} color="white" /></Pressable>
+      <Pressable onPress={()=>{navigation.navigate('NewTweet');}} style={styles.NewTweet}><Ionicons name="add" size={30} color="white" /></Pressable>
     </View>
     
   )
@@ -201,7 +146,7 @@ const styles = StyleSheet.create({
   },
   header:{
     backgroundColor:'#16202A',
-    width:360,
+    width:'100%',
     height:60,
     top:0,
     flex:0,
@@ -274,15 +219,30 @@ const styles = StyleSheet.create({
     alignItems:"center"
   },
   info:{
-    width:125,
+    width:180,
     flexWrap:'wrap',
     flexDirection:'row'
   },
   input:{
     color:"white",
-    marginTop:10,
-    marginLeft:10,
+    marginTop:25,
+    marginLeft:'1%',
     marginBottom:10,
+    width:'100%',
+  },
+  inputbusqueda:{
+    color:"white",
+    marginTop:25,
+    marginLeft:'1%',
+    marginBottom:10,
+    width:'35%',
+  },
+  search:{
+    color:"white",
+    marginTop:25,
+    marginLeft:'25%',
+    marginBottom:10,
+    width:'8%',
   },
   
   NewTweet:{
@@ -306,7 +266,7 @@ const styles = StyleSheet.create({
   },
   header:{
     backgroundColor:'#16202A',
-    width:360,
+    width:'100%',
     height:60,
     top:0,
     flex:0,
@@ -316,4 +276,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Home
+export default Search

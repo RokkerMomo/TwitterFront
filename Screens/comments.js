@@ -2,7 +2,7 @@ import { Button, Pressable, StyleSheet, Text, View,
     ScrollView,Image,RefreshControl,ActivityIndicator,Alert} from 'react-native';
     import { Ionicons } from '@expo/vector-icons';
     import React, { useState, useEffect } from 'react';
-    import Like from "../components/button";
+    import Like from "../components/ButtonComments";
     import env from '../env';
 import { TextInput } from 'react-native-gesture-handler';
     
@@ -30,6 +30,7 @@ import { TextInput } from 'react-native-gesture-handler';
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
+            'Authorization':`Bearer ${Token}`
           },
           body: JSON.stringify({
             _id:`${userid}`
@@ -55,6 +56,7 @@ import { TextInput } from 'react-native-gesture-handler';
             headers: {
               Accept: 'application/json',
               'Content-Type': 'application/json',
+              'Authorization':`Bearer ${Token}`
             },
             body: JSON.stringify({
               idTweet:`${idTweet}`
@@ -78,6 +80,7 @@ import { TextInput } from 'react-native-gesture-handler';
             headers: {
               Accept: 'application/json',
               'Content-Type': 'application/json',
+              'Authorization':`Bearer ${Token}`
             },
             body: JSON.stringify({
               idTweet:`${idTweet}`
@@ -100,6 +103,7 @@ import { TextInput } from 'react-native-gesture-handler';
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'Authorization':`Bearer ${Token}`
       },
       body: JSON.stringify({
         idTweet:`${datos._id}`,
@@ -119,6 +123,8 @@ import { TextInput } from 'react-native-gesture-handler';
        }
     
       useEffect(() => {
+        console.log('AQUI TA EL TOKEN')
+        console.log(Token)
         gettweet();
         finduser();
         getcomentarios();
@@ -133,7 +139,7 @@ import { TextInput } from 'react-native-gesture-handler';
           <View style={styles.header}>
         <Pressable onPress={()=>{navigation.navigate('Home',{
         userid:userid,
-        token:Token,
+        Token:Token,
         nuevo:true,
       })}}><Ionicons style={styles.backbutton} name="arrow-back" size={30} color="white" /></Pressable>
         <Text style={styles.Titulo}>Comentarios</Text>
@@ -164,7 +170,7 @@ import { TextInput } from 'react-native-gesture-handler';
     
               <Text style={styles.usuario}>{datos&&datos.fecha.slice(0, 10)}</Text>
               <Text style={styles.input}>{datos&&datos.descripcion}</Text>
-              {(datos&&datos.foto!=="undefined") && <Image source={{ uri: `${datos&&datos.foto}` }} style={{ width: 310, height: 310, position:'relative', marginBottom:5, borderRadius:10 }} />}
+              {(datos&&datos.foto!=="undefined") && <Image source={{ uri: `${datos&&datos.foto}` }} style={{ width: '100%', height: 310, position:'relative', marginBottom:5, borderRadius:10,marginTop:5 }} />}
               </View>     
               </View>
 
@@ -183,6 +189,7 @@ import { TextInput } from 'react-native-gesture-handler';
               <TextInput onChangeText={onChangeDescripcion} value={descripcion} multiline maxLength={280} placeholder='Escribe tu comentario' placeholderTextColor='white' style={styles.inputcomentario}></TextInput>
               <Pressable onPress={()=>{NewComentario(descripcion)}} style={styles.send}><Text>Enviar</Text></Pressable>
               </View>
+
 
               {comentarios&&comentarios.map((comentario) => {
         return (
@@ -205,6 +212,7 @@ import { TextInput } from 'react-native-gesture-handler';
     
               <Text style={styles.usuario}>{comentario.fecha.slice(0, 10)}</Text>
               <Text style={styles.input}>{comentario.descripcion}</Text>
+              <Like idTweet={comentario._id} userid={userid} token={Token}></Like>
 
           </View>
         );
@@ -234,11 +242,13 @@ import { TextInput } from 'react-native-gesture-handler';
       },
       header:{
         backgroundColor:'#16202A',
-        width:360,
+        width:'100%',
         height:60,
         top:0,
         flex:0,
-        flexWrap:'wrap'
+        flexWrap:'wrap',
+        borderBottomLeftRadius:10,
+        borderBottomRightRadius:10
       },
       footer:{
         height:25,
@@ -340,7 +350,7 @@ import { TextInput } from 'react-native-gesture-handler';
       },
       header:{
         backgroundColor:'#16202A',
-        width:360,
+        width:'100%',
         height:60,
         top:0,
         flex:0,
@@ -350,7 +360,7 @@ import { TextInput } from 'react-native-gesture-handler';
       },
       newcomentario:{
       backgroundColor:'#16202A',
-      width:350,
+      width:'98%',
       borderRadius:10,
       paddingTop:16,
       paddingRight:20,

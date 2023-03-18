@@ -28,6 +28,7 @@ import { Button, Pressable, StyleSheet, Text, View,
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
+            'Authorization':`Bearer ${Token}`
           },
           body: JSON.stringify({
             userid:`${userid}`
@@ -61,11 +62,19 @@ import { Button, Pressable, StyleSheet, Text, View,
           {Tweets&&Tweets.map((Tweet) => {
             const fecha = Tweet.fecha.slice(0, 10);
             return (
-              <View key={Tweet._id} style={styles.Carta}>
+
+
+              <Pressable onPress={()=>{navigation.navigate('Drawer', {
+                screen: 'comments',
+                params: { idTweet: `${Tweet._id}`,userid: userid,Token:Token },
+              })}} key={Tweet._id} style={styles.Carta}>
+             
+             
               <View style={styles.contenido}>
+               
               <Pressable onPress={()=>{navigation.navigate('Drawer', {
       screen: 'Profile',
-      params: { profileid: `${Tweet.owner}`,userid: userid },
+      params: { profileid: `${Tweet.owner}`,userid: userid,Token:`${Token}` },
     })}} style={styles.Foto}>
               <Image
             style={styles.tinyLogo}
@@ -79,16 +88,30 @@ import { Button, Pressable, StyleSheet, Text, View,
               <Text style={styles.usuario}>@{Tweet.owneruser}</Text>
               </View>
     
-              <Text style={styles.usuario}>{fecha }</Text>
-              <Text style={styles.input}>{Tweet.descripcion}</Text>
-              {(Tweet.foto!=="undefined") && <Image source={{ uri: Tweet.foto }} style={{ width: 310, height: 310, position:'relative', marginBottom:5, borderRadius:10 }} />}
-              </View>
-              <View style={styles.footer}>
-              <Pressable style={styles.heart}><AntDesign name="message1" size={20} color="white" /><Text style={styles.number}> 25</Text></Pressable>
-              <Like idTweet={Tweet._id} userid={userid}></Like>
-              </View>
+              <Text style={styles.usuario}> {fecha}</Text>
+    
+    
+    
               
+              {(Tweet.owner==userid) &&<Pressable onPress={()=>{createTwoButtonAlert(Tweet._id)}} style={{marginLeft:'10%'}}><Ionicons name="ios-trash" size={20} color="red" /></Pressable>}
+             
+             
+             
+             
+             
+             
               </View>
+    
+    
+    
+              <Text style={styles.input}>{Tweet.descripcion}</Text>
+              {(Tweet.foto!=="undefined") && <Image source={{ uri: Tweet.foto }} style={{ width: '100%', height: 310, marginBottom:5, borderRadius:10,position:'relative' }} />}
+              
+    
+              
+              <Like idTweet={Tweet._id} userid={userid} token={Token}></Like>
+              
+              </Pressable>
             );
           })}
           <ActivityIndicator style={{marginTop:50}} animating={state} size="large" color="#239EEC" />
@@ -136,14 +159,14 @@ import { Button, Pressable, StyleSheet, Text, View,
       },
       Carta:{
         backgroundColor:'#16202A',
-        width:350,
+        width:'98%',
         borderRadius:10,
         paddingTop:16,
         paddingRight:20,
         paddingLeft:20,
         paddingBottom:5,
         marginTop:10,
-        left:5,
+        left:'1%',
         flex:0,
         display:"flex",
       },
@@ -190,7 +213,7 @@ import { Button, Pressable, StyleSheet, Text, View,
         alignItems:"center"
       },
       info:{
-        width:180,
+        width:125,
         flexWrap:'wrap',
         flexDirection:'row'
       },

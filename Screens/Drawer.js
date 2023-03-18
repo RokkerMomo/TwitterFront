@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text, TextInput } from 'react-native'
 import React from 'react'
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,8 +8,10 @@ import Perfil from "./Profile";
 import EditProfile from "./EditProfile";
 import Following from "./Following";
 import comments from "./comments";
+import search from "./search";
 import button from "../components/button";
-
+import { StyleSheet } from 'react-native';
+import { Pressable } from 'react-native';
 
 const contenedor = createDrawerNavigator();
 
@@ -32,8 +34,16 @@ drawerStyle:{
     backgroundColor:'#637885',
 },
 }}>
-    <contenedor.Screen name="Home" initialParams={{userid: route.params.params.userid}} options={{
-      
+    <contenedor.Screen name="Home" initialParams={{userid: route.params.params.userid,Token:route.params.params.token}} options={{
+      headerRight: () => (
+         <Pressable onPress={()=>{navigation.navigate('Drawer', {
+            screen: 'search',
+            params: {userid: route.params.params.userid,Token:route.params.params.token},
+          })}}>
+            <Ionicons style={styles.search} name="ios-search" size={24} color="white" />
+         </Pressable>
+         
+       ),
     drawerIcon: ({focused, size}) => (
        <Ionicons
           name="md-home"
@@ -43,7 +53,7 @@ drawerStyle:{
     )
     }} component={Home} />
 
-<contenedor.Screen name="Following" initialParams={{userid: route.params.params.userid}} options={{
+<contenedor.Screen name="Following" initialParams={{userid: route.params.params.userid,Token:route.params.params.token}} options={{
       unmountOnBlur:true,
       drawerIcon: ({focused, size}) => (
          <Ionicons
@@ -55,7 +65,7 @@ drawerStyle:{
       }} component={Following} />
 
 
-    <contenedor.Screen name="MyProfile" initialParams={{userid: route.params.params.userid ,profileid:route.params.params.userid}} options={{
+    <contenedor.Screen name="MyProfile" initialParams={{userid: route.params.params.userid,Token:route.params.params.token,profileid:route.params.params.userid}} options={{
       unmountOnBlur:true,
     drawerIcon: ({focused, size}) => (
        <Ionicons
@@ -66,7 +76,7 @@ drawerStyle:{
     )
     }} component={Perfil} />
 
-<contenedor.Screen name="EditProfile" initialParams={{userid: route.params.params.userid ,profileid:route.params.params.userid}} options={{
+<contenedor.Screen name="EditProfile" initialParams={{userid: route.params.params.userid,Token:route.params.params.token,profileid:route.params.params.userid}} options={{
       unmountOnBlur:true,
       drawerItemStyle:{height:0},
     drawerIcon: ({focused, size}) => (
@@ -79,7 +89,7 @@ drawerStyle:{
     }} component={EditProfile} />
 
 
-    <contenedor.Screen name="Profile" initialParams={{userid: route.params.params.userid}} options={{
+    <contenedor.Screen name="Profile" initialParams={{userid: route.params.params.userid,Token:route.params.params.token}} options={{
       unmountOnBlur:true,drawerItemStyle:{height:0}}} component={Perfil} />
 
       
@@ -89,7 +99,7 @@ drawerStyle:{
                     headerShown:false,
                     unmountOnBlur:true
                 }} 
-                initialParams={{userid: route.params.params.userid}} component={NewTweet}/>
+                initialParams={{userid: route.params.params.userid,Token:route.params.params.token}} component={NewTweet}/>
 
 
 <contenedor.Screen name='comments' options={{
@@ -97,14 +107,15 @@ drawerStyle:{
                     headerShown:false,
                     unmountOnBlur:true
                 }} 
-                initialParams={{userid: route.params.params.userid}} component={comments}/>
+                initialParams={{userid: route.params.params.userid,Token:route.params.params.token}} component={comments}/>
 
-<contenedor.Screen name='button' options={{
+<contenedor.Screen name='search' options={{
                     drawerItemStyle: { height: 0 },
-                    headerShown:false,
-                    unmountOnBlur:true
-                }} 
-               component={button}/>
+                    unmountOnBlur:true,
+                    headerShown:false
+                }}
+               initialParams={{userid: route.params.params.userid,Token:route.params.params.token}}
+               component={search}/>
 
       
 
@@ -114,3 +125,9 @@ drawerStyle:{
 }
 
 export default Drawer
+
+const styles = StyleSheet.create({
+   search:{
+       marginRight:10
+   }
+ })

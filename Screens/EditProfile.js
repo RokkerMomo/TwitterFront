@@ -42,6 +42,7 @@ const EditProfile = ({route,navigation}) => {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'Authorization':`Bearer ${Token}`
       },
       body: JSON.stringify({
         _id:`${profileid}`
@@ -77,6 +78,7 @@ const EditProfile = ({route,navigation}) => {
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
+    'Authorization':`Bearer ${Token}`
   },
   body: JSON.stringify({
     _id:`${profileid}`,
@@ -122,7 +124,7 @@ const EditProfile = ({route,navigation}) => {
     <View style={styles.Body}>
       <View style={styles.Carta}>
         
-        <Pressable onPress={pickImage} style={styles.agregarfoto}>
+        <Pressable style={styles.agregarfoto}>
         {image && <Image source={{ uri: image&&image }} style={{ width: 100, height: 100, position:'absolute', borderRadius:50 }} />}
           {!image &&<MaterialIcons name="add-a-photo" size={24} color="grey" />}
           </Pressable>

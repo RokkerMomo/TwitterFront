@@ -14,6 +14,7 @@ const NewTweet = ({route,navigation}) => {
   const [mostrar,setmostrar] = useState(null);
   const [resultadoimagen,setresultadoimagen] = useState(null);
   const [uploading,setUploading] = useState(false);
+  const [cargando,setcargando] = useState(false)
 
 
 
@@ -54,6 +55,7 @@ const NewTweet = ({route,navigation}) => {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
+          'Authorization':`Bearer ${Token}`
         },
         body: JSON.stringify({
           _id:`${userid}`
@@ -75,66 +77,73 @@ const NewTweet = ({route,navigation}) => {
 
     const NewTweet = async (owner,content)=>{
 
-      if (image!=null) {
-        setUploading(true);
-    const response = await fetch(image.uri)
-    const blob = await response.blob();
-    const filename = image.uri.substring(image.uri.lastIndexOf('/')+1);
-    const result = await UploadFile(blob,filename)
-    console.log(result)
-    setresultadoimagen(result)
-
-
-    const requestOptions = {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      ownername:`${Datos.nombre} ${Datos.apellido}`,
-      ownerLastname:`${Datos.apellido}`,
-      owneruser:`${Datos.usuario}`,
-      owner:`${owner}`,
-      descripcion:`${content}`,
-      foto:`${result}`,
-      fotoperfil:`${Datos.foto}`,
-      fecha:`${date}`
-    })}
-      //axios
-      fetch(`${env.SERVER.URI}/newtweet`,requestOptions)
-      console.log('ENVIADO')
-      navigation.navigate('Home',{
-        userid:userid,
-        token:Token,
-        nuevo:true,
-      })
-      }else{
-        const requestOptions = {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ownername:`${Datos.nombre} ${Datos.apellido}`,
-            ownerLastname:`${Datos.apellido}`,
-            owneruser:`${Datos.usuario}`,
-            owner:`${owner}`,
-            descripcion:`${content}`,
-            foto:"undefined",
-            fotoperfil:`${Datos.foto}`,
-            fecha:`${date}`
-          })}
-            //axios
-            fetch(`${env.SERVER.URI}/newtweet`,requestOptions)
-            console.log('ENVIADO')
-            navigation.navigate('Home',{
-              userid:userid,
-              token:Token,
-              nuevo:true
-            })
+      if (cargando==false) {
+        setcargando(true);
+        if (image!=null) {
+          setUploading(true);
+      const response = await fetch(image.uri)
+      const blob = await response.blob();
+      const filename = image.uri.substring(image.uri.lastIndexOf('/')+1);
+      const result = await UploadFile(blob,filename)
+      console.log(result)
+      setresultadoimagen(result)
+  
+  
+      const requestOptions = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization':`Bearer ${Token}`
+      },
+      body: JSON.stringify({
+        ownername:`${Datos.nombre} ${Datos.apellido}`,
+        ownerLastname:`${Datos.apellido}`,
+        owneruser:`${Datos.usuario}`,
+        owner:`${owner}`,
+        descripcion:`${content}`,
+        foto:`${result}`,
+        fotoperfil:`${Datos.foto}`,
+        fecha:`${date}`
+      })}
+        //axios
+        fetch(`${env.SERVER.URI}/newtweet`,requestOptions)
+        console.log('ENVIADO')
+        navigation.navigate('Home',{
+          userid:userid,
+          Token:Token,
+          nuevo:true,
+        })
+        }else{
+          const requestOptions = {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization':`Bearer ${Token}`
+            },
+            body: JSON.stringify({
+              ownername:`${Datos.nombre} ${Datos.apellido}`,
+              ownerLastname:`${Datos.apellido}`,
+              owneruser:`${Datos.usuario}`,
+              owner:`${owner}`,
+              descripcion:`${content}`,
+              foto:"undefined",
+              fotoperfil:`${Datos.foto}`,
+              fecha:`${date}`
+            })}
+              //axios
+              fetch(`${env.SERVER.URI}/newtweet`,requestOptions)
+              console.log('ENVIADO')
+              navigation.navigate('Home',{
+                userid:userid,
+                token:Token,
+                nuevo:true
+              })
+        }
       }
+
+      
     
      }
      
@@ -144,7 +153,7 @@ const NewTweet = ({route,navigation}) => {
       <View style={styles.header}>
         <Pressable onPress={()=>{navigation.navigate('Home',{
         userid:userid,
-        token:Token,
+        Token:Token,
         nuevo:true,
       })}}><Ionicons style={styles.backbutton} name="arrow-back" size={30} color="white" /></Pressable>
         <Text style={styles.Titulo}>Nuevo Tweet</Text>
@@ -206,7 +215,7 @@ const styles = StyleSheet.create({
     },
     header:{
       backgroundColor:'#16202A',
-      width:360,
+      width:'100%',
       height:60,
       top:0,
       flex:0,
@@ -220,13 +229,13 @@ const styles = StyleSheet.create({
     },
     Carta:{
       backgroundColor:'#16202A',
-      width:350,
+      width:'98%',
       borderRadius:10,
       paddingTop:16,
       paddingRight:20,
       paddingLeft:20,
       marginTop:10,
-      left:5,
+      left:'0.5%',
       display:'flex',
       flexWrap:'wrap',
       flexDirection:'row'
