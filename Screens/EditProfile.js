@@ -2,6 +2,7 @@ import {Button, Pressable, StyleSheet, Text, TextInput, View,Alert,Image, Scroll
 import * as ImagePicker from 'expo-image-picker'
 import React, {useEffect, useState} from 'react'
 import { firebase, UploadFile } from "../components/config/config";
+import Dialog from "react-native-dialog";
 import { MaterialIcons } from '@expo/vector-icons';
 import env from '../env';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +16,13 @@ const EditProfile = ({route,navigation}) => {
   const [apellido,onChangeApellido] = useState('Apellido')
   const [usuario,onChangeUsuario] = useState('Usuario')
   const [bio,onChangeBio] = useState('Biografia')
+  const [mostrarcambio,setmostrarcambio] =useState(false)
+  const [sendinput,setsendinput] = useState(null)
+
+  const [vieja,onChangeVieja] = useState("")
+  const [nueva,onChangeNueva] = useState("")
+
+  
 
 
   const pickImage = async () =>{
@@ -110,10 +118,40 @@ const EditProfile = ({route,navigation}) => {
   }
 
   let msg ="";
+
+
      const createTwoButtonAlert = () =>
     Alert.alert('Alerta!', `${msg}`, [
       {text: 'OK', onPress: () => console.log('OK Pressed')},
     ]);
+
+    async function Changepass (){
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization':`Bearer ${Token}`
+        },
+        body: JSON.stringify({
+          _id:`${profileid}`,
+        actual:`${vieja}`,
+        nueva:`${nueva}`
+        })}
+      // Similar to componentDidMount and componentDidUpdate:
+      await fetch(`${env.SERVER.URI}/editpass`,requestOptions)
+      .then(res =>{
+        if (res.status=="400"){
+        }else{}
+        return res.json();
+      }).then(
+        (result) =>{
+          msg=result.msg;
+        createTwoButtonAlert();
+        setmostrarcambio(false)
+        }
+      )
+    }
 
     useEffect(()=>{
       GetData();
@@ -122,6 +160,21 @@ const EditProfile = ({route,navigation}) => {
     const {userid,profileid,Token} = route.params;
   return (
     <View style={styles.Body}>
+
+
+<Dialog.Container visible={mostrarcambio}>
+      <Dialog.Title>Cambiar Contraseña</Dialog.Title>
+      <Dialog.Description>
+        Ingrese los datos
+      </Dialog.Description>
+      <Dialog.Input secureTextEntry={true} label="Contraseña actual" onChangeText={onChangeVieja} value={vieja}></Dialog.Input>
+      <Dialog.Input secureTextEntry={true} label="Contraseña Nueva"  onChangeText={onChangeNueva} value={nueva}></Dialog.Input>
+      <Dialog.Button onPress={()=>{setmostrarcambio(false)}} label="Cancelar" />
+      <Dialog.Button onPress={()=>{Changepass()}} label="Cambiar" />
+    </Dialog.Container>
+
+
+
       <View style={styles.Carta}>
         
         <Pressable style={styles.agregarfoto}>
@@ -135,7 +188,7 @@ const EditProfile = ({route,navigation}) => {
         <TextInput onChangeText={onChangeUsuario} value={usuario} placeholder='Usuario' style={styles.Input}></TextInput>
         <TextInput value={'somesecretpassword'} editable={false} secureTextEntry={true} placeholder='Password' style={styles.Inputpass}></TextInput>
       
-        <Pressable style={styles.changepass}><Ionicons name="md-key-sharp" size={30} color="black" /><Text style={styles.textchangepass}> Cambiar</Text></Pressable>
+        <Pressable onPress={()=>{setmostrarcambio(true)}} style={styles.changepass}><Ionicons name="md-key-sharp" size={30} color="black" /><Text style={styles.textchangepass}> Cambiar</Text></Pressable>
 
         <TextInput onChangeText={onChangeBio} value={bio}
         editable

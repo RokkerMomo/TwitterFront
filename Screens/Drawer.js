@@ -35,15 +35,7 @@ drawerStyle:{
 },
 }}>
     <contenedor.Screen name="Home" initialParams={{userid: route.params.params.userid,Token:route.params.params.token}} options={{
-      headerRight: () => (
-         <Pressable onPress={()=>{navigation.navigate('Drawer', {
-            screen: 'search',
-            params: {userid: route.params.params.userid,Token:route.params.params.token},
-          })}}>
-            <Ionicons style={styles.search} name="ios-search" size={24} color="white" />
-         </Pressable>
-         
-       ),
+      headerShown:false,
     drawerIcon: ({focused, size}) => (
        <Ionicons
           name="md-home"
@@ -111,7 +103,7 @@ drawerStyle:{
 
 <contenedor.Screen name='search' options={{
                     drawerItemStyle: { height: 0 },
-                    unmountOnBlur:true,
+                    unmountOnBlur:false,
                     headerShown:false
                 }}
                initialParams={{userid: route.params.params.userid,Token:route.params.params.token}}

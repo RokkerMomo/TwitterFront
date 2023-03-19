@@ -137,7 +137,7 @@ const NewTweet = ({route,navigation}) => {
               console.log('ENVIADO')
               navigation.navigate('Home',{
                 userid:userid,
-                token:Token,
+                Token:Token,
                 nuevo:true
               })
         }

@@ -67,8 +67,7 @@ const Search = ({route,navigation}) => {
 <View style={styles.header}>
         <Pressable onPress={()=>{navigation.navigate('Home',{
         userid:userid,
-        Token:Token,
-        nuevo:true,
+        Token:Token
       })}}><Ionicons style={styles.backbutton} name="arrow-back" size={30} color="white" /></Pressable>
         <Text style={styles.Titulo}>Busqueda</Text>
         <Pressable onPress={()=>{getTweets()}} ><Ionicons style={styles.search} name="ios-search" size={24} color="white" /></Pressable>
@@ -83,7 +82,7 @@ const Search = ({route,navigation}) => {
 
           <Pressable onPress={()=>{navigation.navigate('Drawer', {
             screen: 'comments',
-            params: { idTweet: `${Tweet._id}`,userid: userid },
+            params: { idTweet: `${Tweet._id}`,userid: userid,Token:Token },
           })}} key={Tweet._id} style={styles.Carta}>
          
          
@@ -91,7 +90,7 @@ const Search = ({route,navigation}) => {
            
           <Pressable onPress={()=>{navigation.navigate('Drawer', {
   screen: 'Profile',
-  params: { profileid: `${Tweet.owner}`,userid: userid },
+  params: { profileid: `${Tweet.owner}`,userid: userid,Token:Token },
 })}} style={styles.Foto}>
           <Image
         style={styles.tinyLogo}
@@ -113,7 +112,7 @@ const Search = ({route,navigation}) => {
           
 
           
-          <Like idTweet={Tweet._id} userid={userid}></Like>
+          <Like idTweet={Tweet._id} userid={userid} token={Token}></Like>
           
           </Pressable>
         );
@@ -123,7 +122,11 @@ const Search = ({route,navigation}) => {
       <ActivityIndicator style={{marginTop:50}} animating={state} size="large" color="#239EEC" />
       </ScrollView>
 
-      <Pressable onPress={()=>{navigation.navigate('NewTweet');}} style={styles.NewTweet}><Ionicons name="add" size={30} color="white" /></Pressable>
+      <Pressable onPress={()=>{navigation.navigate('NewTweet',{
+        userid:userid,
+        Token:Token,
+        nuevo:true,
+      });}} style={styles.NewTweet}><Ionicons name="add" size={30} color="white" /></Pressable>
     </View>
     
   )

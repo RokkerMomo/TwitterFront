@@ -16,6 +16,34 @@ import { TextInput } from 'react-native-gesture-handler';
       const [datos,setDatos] =useState(null);
       const [usuario,setUsuario] =useState(null)
       const [descripcion,onChangeDescripcion] = useState('')
+
+
+      const createTwoButtonAlert = (idtweet) =>
+    Alert.alert('Alerta', 'Seguro que quieres borrar este Comentario ?', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {text: 'Borrar', onPress: () => {const requestOptions = {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization':`Bearer ${Token}`
+        },
+        body: JSON.stringify({
+          idTweet:`${idtweet}`
+        })}
+    fetch(`${env.SERVER.URI}/deletecomentario`,requestOptions)
+    .then((response) => response.json())
+    .then((data) =>{
+      console.log(data)
+      setState(true)
+        setNuevo(true)
+          
+    } );}},
+    ]);
     
       const onRefresh = React.useCallback(() => {
         setRefreshing(true);
@@ -123,8 +151,6 @@ import { TextInput } from 'react-native-gesture-handler';
        }
     
       useEffect(() => {
-        console.log('AQUI TA EL TOKEN')
-        console.log(Token)
         gettweet();
         finduser();
         getcomentarios();
@@ -211,6 +237,7 @@ import { TextInput } from 'react-native-gesture-handler';
               </View>
     
               <Text style={styles.usuario}>{comentario.fecha.slice(0, 10)}</Text>
+              {(comentario.owner==userid) &&<Pressable onPress={()=>{createTwoButtonAlert(comentario._id)}} style={{marginLeft:'10%'}}><Ionicons name="ios-trash" size={20} color="red" /></Pressable>}
               <Text style={styles.input}>{comentario.descripcion}</Text>
               <Like idTweet={comentario._id} userid={userid} token={Token}></Like>
 
@@ -318,7 +345,7 @@ import { TextInput } from 'react-native-gesture-handler';
         alignItems:"center"
       },
       info:{
-        width:180,
+        width:125,
         flexWrap:'wrap',
         flexDirection:'row'
       },

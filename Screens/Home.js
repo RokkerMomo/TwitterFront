@@ -111,6 +111,15 @@ const Home = ({route,navigation}) => {
   return (
 
     <View style={styles.Body}>
+      
+      <View style={styles.header}>
+        <Pressable onPress={()=>{navigation.openDrawer();}}><Ionicons style={styles.backbutton} name="menu" size={30} color="white" /></Pressable>
+        <Text style={styles.Titulo}>Home</Text>
+        <Pressable style={styles.search} onPress={()=>{navigation.navigate('Drawer', {
+            screen: 'search',
+            params: {userid: userid,Token:Token },
+          })}} ><Ionicons  name="ios-search" size={24} color="white" /></Pressable>
+      </View>
       <ScrollView
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -313,7 +322,14 @@ const styles = StyleSheet.create({
     flexWrap:'wrap',
     borderBottomLeftRadius:10,
     borderBottomRightRadius:10
-  }
+  },search:{
+    justifyContent:'center',
+    alignItems:'center',
+    width:30,
+    height:30,
+marginLeft:'55%',
+    top:'40%'
+}
 })
 
 export default Home

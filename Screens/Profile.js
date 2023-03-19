@@ -268,35 +268,61 @@ const Profile = ({route,navigation}) => {
 
 
 
-      {Tweets&&Tweets.map((Tweet) => {
+          {Tweets&&Tweets.map((Tweet) => {
         const fecha = Tweet.fecha.slice(0, 10);
         return (
-          
-          <View key={Tweet._id} style={styles.Carta}>
+
+
+          <Pressable onPress={()=>{navigation.navigate('Drawer', {
+            screen: 'comments',
+            params: { idTweet: `${Tweet._id}`,userid: userid,Token:Token },
+          })}} key={Tweet._id} style={styles.Carta}>
+         
+         
           <View style={styles.contenido}>
-          <View style={styles.Foto}>
+           
+          <Pressable onPress={()=>{navigation.navigate('Drawer', {
+  screen: 'Profile',
+  params: { profileid: `${Tweet.owner}`,userid: userid,Token:`${Token}` },
+})}} style={styles.Foto}>
           <Image
         style={styles.tinyLogo}
         source={{
           uri: Tweet.fotoperfil,
         }}
       />
-          </View>
+          </Pressable>
           <View style={styles.info}>
           <Text style={styles.NombreCompleto}>{Tweet.ownername} </Text>
           <Text style={styles.usuario}>@{Tweet.owneruser}</Text>
           </View>
 
-          <Text style={styles.fecha}> {fecha}</Text>
-          {(Tweet.owner==userid) &&<Pressable onPress={()=>{createTwoButtonAlert(Tweet._id)}} style={{marginLeft:'10%'}}><Ionicons name="ios-trash" size={20} color="red" /></Pressable>}
+          <Text style={styles.usuario}> {fecha}</Text>
+
+
+
           
+          {(Tweet.owner==userid) &&<Pressable onPress={()=>{createTwoButtonAlert(Tweet._id)}} style={{marginLeft:'10%'}}><Ionicons name="ios-trash" size={20} color="red" /></Pressable>}
+         
+         
+         
+         
+         
+         
           </View>
+
+
+
           <Text style={styles.input}>{Tweet.descripcion}</Text>
-          {(Tweet.foto!=="undefined") && <Image source={{ uri: Tweet.foto }} style={{ width: 310, height: 310, position:'relative', marginBottom:5, borderRadius:10 }} />}
+          {(Tweet.foto!=="undefined") && <Image source={{ uri: Tweet.foto }} style={{ width: '100%', height: 310, marginBottom:5, borderRadius:10,position:'relative' }} />}
+          
+
+          
           <Like idTweet={Tweet._id} userid={userid} token={Token}></Like>
           
-          </View>
+          </Pressable>
         );
+
       })}
       <ActivityIndicator style={{marginTop:50}} animating={state} size="large" color="#239EEC" />
       </ScrollView>
