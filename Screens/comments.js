@@ -220,6 +220,8 @@ import { TextInput } from 'react-native-gesture-handler';
               {comentarios&&comentarios.map((comentario) => {
         return (
           <View key={comentario._id} style={styles.newcomentario}>
+
+            <View style={styles.contenido}>
             <View onPress={()=>{navigation.navigate('Drawer', {
       screen: 'Profile',
       params: { profileid: datos&&datos.owner,userid: userid },
@@ -231,13 +233,14 @@ import { TextInput } from 'react-native-gesture-handler';
             }}
           />
               </View>
-              <View style={styles.info}>
+              <View style={styles.infocomentario}>
               <Text style={styles.NombreCompleto}>{comentario.ownername} </Text>
               <Text style={styles.usuario}>@{comentario.owneruser}</Text>
               </View>
     
               <Text style={styles.usuario}>{comentario.fecha.slice(0, 10)}</Text>
               {(comentario.owner==userid) &&<Pressable onPress={()=>{createTwoButtonAlert(comentario._id)}} style={{marginLeft:'10%'}}><Ionicons name="ios-trash" size={20} color="red" /></Pressable>}
+              </View>
               <Text style={styles.input}>{comentario.descripcion}</Text>
               <Like idTweet={comentario._id} userid={userid} token={Token}></Like>
 
@@ -345,6 +348,11 @@ import { TextInput } from 'react-native-gesture-handler';
         alignItems:"center"
       },
       info:{
+        width:180,
+        flexWrap:'wrap',
+        flexDirection:'row'
+      },
+      infocomentario:{
         width:125,
         flexWrap:'wrap',
         flexDirection:'row'

@@ -105,7 +105,7 @@ const Home = ({route,navigation}) => {
     }),
     
     getTweets();
-  },[refreshing]);
+  },[refreshing,navigation, hasUnsavedChanges]);
 
   const {userid,Token} = route.params;
   return (
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   },
   header:{
     backgroundColor:'#16202A',
-    width:360,
+    width:'100%',
     height:60,
     top:0,
     flex:0,
